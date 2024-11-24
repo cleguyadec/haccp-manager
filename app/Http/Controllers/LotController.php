@@ -202,6 +202,42 @@ class LotController extends Controller
         $this->product->updateStockFromLots();
     }
 
+    public function transferStock(Request $request, Lot $lot)
+    {
+        $request->validate([
+            'source_location_id' => 'required|exists:locations,id',
+            'destination_location_id' => 'required|exists:locations,id|different:source_location_id',
+            'amount' => 'required|integer|min:1',
+        ]);
+    
+        // Corrige la requête en qualifiant explicitement les colonnes
+        $sourceLocation = $lot->locations()->where('locations.id', $request->source_location_id)->first();
+        $destinationLocation = $lot->locations()->where('locations.id', $request->destination_location_id)->first();
+    
+        if (!$sourceLocation || !$destinationLocation) {
+            return redirect()->back()->with('error', 'Emplacement source ou destination invalide.');
+        }
+    
+        if ($sourceLocation->pivot->stock < $request->amount) {
+            return redirect()->back()->with('error', 'Stock insuffisant dans l\'emplacement source.');
+        }
+    
+        // Mise à jour des stocks
+        $lot->locations()->updateExistingPivot($request->source_location_id, [
+            'stock' => $sourceLocation->pivot->stock - $request->amount,
+        ]);
+    
+        $lot->locations()->updateExistingPivot($request->destination_location_id, [
+            'stock' => $destinationLocation->pivot->stock + $request->amount,
+        ]);
+    
+        // Recalculer le stock du lot et du produit
+        $lot->updateStockFromLocations();
+    
+        return redirect()->route('lots.locations.manage', $lot->id)->with('success', 'Stock transféré avec succès.');
+    }
+
+
 
 
 }

@@ -14,9 +14,7 @@ class Lot extends Model
     // Relation avec les emplacements
     public function locations()
     {
-        return $this->belongsToMany(Location::class, 'lot_location')
-            ->withPivot('stock')
-            ->withTimestamps();
+        return $this->belongsToMany(Location::class, 'lot_location')->withPivot('stock');
     }
 
     // Relation avec le produit

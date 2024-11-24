@@ -14,6 +14,6 @@ class Location extends Model
     
     public function lots()
     {
-        return $this->belongsToMany(Lot::class, 'lot_location')->withPivot('stock')->withTimestamps();
+        return $this->belongsToMany(Lot::class, 'lot_location')->withPivot('stock');
     }
 }

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Lot;
 use App\Models\Location;
+use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
@@ -20,11 +21,21 @@ class LocationController extends Controller
         $request->validate([
             'name' => 'required|string|max:255|unique:locations,name',
         ]);
-
-        Location::create(['name' => $request->name]);
-
-        return redirect()->route('locations.manage')->with('success', 'Emplacement créé avec succès.');
+    
+        // Créer le nouvel emplacement
+        $location = Location::create([
+            'name' => $request->name,
+        ]);
+    
+        // Lier ce nouvel emplacement à tous les lots avec un stock initial de 0
+        $lots = Lot::all();
+        foreach ($lots as $lot) {
+            $lot->locations()->attach($location->id, ['stock' => 0]);
+        }
+    
+        return redirect()->route('locations.manage')->with('success', 'Emplacement créé avec succès et lié à tous les lots.');
     }
+    
 
     public function update(Request $request, Location $location)
     {

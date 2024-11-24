@@ -35,6 +35,7 @@ Route::get('/locations/manage', [LocationController::class, 'index'])->name('loc
 Route::post('/locations/manage', [LocationController::class, 'store'])->name('locations.store');
 Route::delete('/locations/{location}', [LocationController::class, 'destroy'])->name('locations.destroy');
 Route::put('/locations/{location}', [LocationController::class, 'update'])->name('locations.update');
+Route::post('/lots/{lot}/locations/transfer', [LotController::class, 'transferStock'])->name('lots.locations.transfer');
 
 
 // Gestion des lots
