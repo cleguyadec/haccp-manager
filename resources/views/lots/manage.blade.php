@@ -1,6 +1,17 @@
 <x-app-layout>
     <div class="container mx-auto p-6">
         <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Gestion des Lots</h1>
+        <div class="mb-4">
+            <form action="{{ route('lots.manage') }}" method="GET" class="flex items-center space-x-4">
+                <input type="hidden" name="product_id" value="{{ $product->id ?? '' }}">
+                <input type="text" name="search" value="{{ $search ?? '' }}" 
+                       placeholder="Rechercher un lot..."
+                       class="border-gray-300 dark:border-gray-600 rounded-md shadow-sm w-1/3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Rechercher
+                </button>
+            </form>
+        </div>
         <table class="table-auto w-full border-collapse border border-gray-300 dark:border-gray-600 mb-6">
             <thead>
                 <tr class="bg-gray-200 dark:bg-gray-700">

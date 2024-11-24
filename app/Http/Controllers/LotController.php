@@ -10,11 +10,42 @@ use Illuminate\Http\Request;
 
 class LotController extends Controller
 {
-    public function manage()
+    public function manage(Request $request)
     {
-        $lots = Lot::with('product')->get();
-        return view('lots.manage', compact('lots'));
+        // Récupérer l'ID du produit et le mot-clé de recherche depuis la requête
+        $productId = $request->input('product_id');
+        $search = $request->input('search');
+    
+        // Construire la requête pour récupérer les lots
+        $lotsQuery = Lot::query();
+    
+        if ($productId) {
+            // Filtrer les lots par produit
+            $lotsQuery->where('product_id', $productId);
+        }
+    
+        if ($search) {
+            // Rechercher par ID du lot, date de péremption ou nom du produit
+            $lotsQuery->where(function ($query) use ($search) {
+                $query->where('id', 'like', "%$search%")
+                      ->orWhere('expiration_date', 'like', "%$search%")
+                      ->orWhereHas('product', function ($productQuery) use ($search) {
+                          $productQuery->where('name', 'like', "%$search%");
+                      });
+            });
+        }
+    
+        // Récupérer les lots et le produit (si un ID est passé)
+        $lots = $lotsQuery->get();
+        $product = $productId ? Product::find($productId) : null;
+    
+        return view('lots.manage', [
+            'lots' => $lots,
+            'product' => $product,
+            'search' => $search,
+        ]);
     }
+    
 
     public function create(Product $product)
     {
