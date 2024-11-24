@@ -65,43 +65,55 @@ class LotController extends Controller
     }
 
     public function update(Request $request, Lot $lot)
-{
-    // Valider les données
-    $request->validate([
-        'origin_location_id' => 'required|exists:locations,id',
-        'destination_location_id' => 'required|exists:locations,id|different:origin_location_id',
-        'stock_amount' => 'required|integer|min:1',
-    ]);
-
-    // Récupérer les emplacements concernés
-    $origin = $lot->locations->find($request->origin_location_id);
-    $destination = $lot->locations->find($request->destination_location_id);
-
-    // Vérifier si l'emplacement d'origine a suffisamment de stock
-    if (!$origin || $origin->pivot->stock < $request->stock_amount) {
-        return redirect()->back()->with('error', 'Stock insuffisant pour déplacer cette quantité.');
-    }
-
-    // Mise à jour des stocks
-    // Déduire la quantité de l'emplacement d'origine
-    $lot->locations()->updateExistingPivot($request->origin_location_id, [
-        'stock' => $origin->pivot->stock - $request->stock_amount,
-    ]);
-
-    // Ajouter la quantité à l'emplacement de destination
-    if ($destination) {
-        $lot->locations()->updateExistingPivot($request->destination_location_id, [
-            'stock' => $destination->pivot->stock + $request->stock_amount,
+    {
+        // Vérifier si la mise à jour concerne la date de péremption
+        if ($request->has('expiration_date')) {
+            $request->validate([
+                'expiration_date' => 'nullable|date',
+            ]);
+    
+            // Mettre à jour la date de péremption
+            $lot->update([
+                'expiration_date' => $request->input('expiration_date'),
+            ]);
+    
+            return redirect()->route('lots.manage')->with('success', 'Date de péremption mise à jour avec succès.');
+        }
+    
+        // Sinon, gérer le transfert de stock
+        $request->validate([
+            'origin_location_id' => 'required|exists:locations,id',
+            'destination_location_id' => 'required|exists:locations,id|different:origin_location_id',
+            'stock_amount' => 'required|integer|min:1',
         ]);
-    } else {
-        // Si l'emplacement de destination n'a pas encore d'association, l'attacher
-        $lot->locations()->attach($request->destination_location_id, [
-            'stock' => $request->stock_amount,
+    
+        // Récupérer les emplacements concernés
+        $origin = $lot->locations->find($request->origin_location_id);
+        $destination = $lot->locations->find($request->destination_location_id);
+    
+        // Vérifier si l'emplacement d'origine a suffisamment de stock
+        if (!$origin || $origin->pivot->stock < $request->stock_amount) {
+            return redirect()->back()->with('error', 'Stock insuffisant pour déplacer cette quantité.');
+        }
+    
+        // Mise à jour des stocks
+        $lot->locations()->updateExistingPivot($request->origin_location_id, [
+            'stock' => $origin->pivot->stock - $request->stock_amount,
         ]);
+    
+        if ($destination) {
+            $lot->locations()->updateExistingPivot($request->destination_location_id, [
+                'stock' => $destination->pivot->stock + $request->stock_amount,
+            ]);
+        } else {
+            $lot->locations()->attach($request->destination_location_id, [
+                'stock' => $request->stock_amount,
+            ]);
+        }
+    
+        return redirect()->route('lots.locations.manage', $lot->id)->with('success', 'Stock déplacé avec succès.');
     }
-
-    return redirect()->route('lots.locations.manage', $lot->id)->with('success', 'Stock déplacé avec succès.');
-}
+    
 
     
     
@@ -138,21 +150,41 @@ class LotController extends Controller
     public function updateLocations(Request $request, Lot $lot)
     {
         $request->validate([
-            'locations.*.id' => 'required|exists:locations,id',
+            'locations' => 'required|array',
             'locations.*.stock' => 'required|integer|min:0',
         ]);
     
-        foreach ($request->locations as $locationData) {
-            $lot->locations()->updateExistingPivot($locationData['id'], [
-                'stock' => $locationData['stock'],
-            ]);
+        $updatedStocks = $request->input('locations');
+    
+        foreach ($updatedStocks as $locationId => $data) {
+            $currentStock = $lot->locations()->where('locations.id', $locationId)->first()->pivot->stock ?? 0;
+    
+            if ($data['stock'] < $currentStock) {
+                // Réduction du stock
+                $difference = $currentStock - $data['stock'];
+    
+                // Vérifiez si la réduction est possible (stock minimum, etc.)
+                if ($difference > $currentStock) {
+                    return redirect()->back()->with('error', 'Réduction impossible, stock insuffisant.');
+                }
+    
+                $lot->locations()->updateExistingPivot($locationId, [
+                    'stock' => $data['stock'],
+                ]);
+            } else {
+                // Sinon, mettez simplement à jour le stock
+                $lot->locations()->updateExistingPivot($locationId, [
+                    'stock' => $data['stock'],
+                ]);
+            }
         }
     
-        // Recalculer le stock du lot et, par extension, du produit
+        // Recalculer les stocks du lot et du produit
         $lot->updateStockFromLocations();
     
-        return redirect()->route('lots.locations.manage', $lot->id)->with('success', 'Emplacements mis à jour avec succès.');
+        return redirect()->route('lots.locations.manage', $lot->id)->with('success', 'Stock mis à jour avec succès.');
     }
+    
     
     
 
@@ -192,15 +224,20 @@ class LotController extends Controller
 
     public function updateStockFromLocations()
     {
+        // Recalculer le stock total du lot à partir des emplacements
         $totalStock = $this->locations->sum(function ($location) {
             return $location->pivot->stock;
         });
     
-        $this->update(['stock' => $totalStock]);
+        $this->stock = $totalStock;
+        $this->save();
     
-        // Mettre à jour le stock du produit associé
-        $this->product->updateStockFromLots();
+        // Recalculer le stock du produit parent
+        $this->product->update([
+            'stock' => $this->product->lots->sum('stock'),
+        ]);
     }
+    
 
     public function transferStock(Request $request, Lot $lot)
     {
