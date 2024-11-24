@@ -88,18 +88,33 @@ class ProductController extends Controller
 
     public function manage(Request $request)
     {
-        $query = Product::query();
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-        if ($request->filled('filter')) {
-            $query->where('stock', '>=', $request->filter);
+        // Récupérer le mot-clé de recherche depuis la requête
+        $search = $request->input('search');
+    
+        // Construire la requête pour récupérer les produits
+        $productsQuery = Product::query();
+    
+        if ($search) {
+            // Rechercher par nom, taille de contenant ou d'autres champs pertinents
+            $productsQuery->where('name', 'like', "%$search%")
+                          ->orWhereHas('container', function ($query) use ($search) {
+                              $query->where('size', 'like', "%$search%");
+                          });
         }
     
-        $products = $query->paginate(10);
-        $containers = Container::all(); // Charger les contenants
+        // Récupérer les produits avec pagination
+        $products = $productsQuery->paginate(10);
     
-        return view('products.manage', compact('products', 'containers'));
+        // Récupérer les conteneurs (pour un dropdown ou une autre fonctionnalité)
+        $containers = Container::all();
+    
+        return view('products.manage', [
+            'products' => $products,
+            'search' => $search,
+            'containers' => $containers, // Transmettre les conteneurs à la vue
+        ]);
     }
+    
+    
 
 }
