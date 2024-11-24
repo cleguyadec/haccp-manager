@@ -14,22 +14,22 @@
             </div>
         @endif
 
-                {{-- Formulaire pour créer un nouvel emplacement --}}
-                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Créer un Nouvel Emplacement</h2>
-                <form action="{{ route('locations.store') }}" method="POST" class="mb-6">
-                    @csrf
-                    <div class="grid grid-cols-1 gap-4">
-                        <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nom de l'Emplacement</label>
-                            <input type="text" id="name" name="name" 
-                                   class="border-gray-300 dark:border-gray-600 rounded-md shadow-sm w-full" required>
-                        </div>
-                    </div>
-                    <button type="submit" 
-                            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4">
-                        Ajouter
-                    </button>
-                </form>
+        {{-- Formulaire pour créer un nouvel emplacement --}}
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Créer un Nouvel Emplacement</h2>
+        <form action="{{ route('locations.store') }}" method="POST" class="mb-6">
+            @csrf
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nom de l'Emplacement</label>
+                    <input type="text" id="name" name="name" 
+                           class="border-gray-300 dark:border-gray-600 rounded-md shadow-sm w-full" required>
+                </div>
+            </div>
+            <button type="submit" 
+                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4">
+                Ajouter
+            </button>
+        </form>
 
         {{-- Liste des emplacements existants --}}
         <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Liste des Emplacements</h2>
@@ -44,30 +44,29 @@
                 @foreach ($locations as $location)
                     <tr class="bg-white dark:bg-gray-800">
                         {{-- Formulaire pour éditer un emplacement --}}
-                        <form action="{{ route('locations.update', $location->id) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2">
+                        <td class="border border-gray-300 dark:border-gray-600 px-4 py-2">
+                            <form action="{{ route('locations.update', $location->id) }}" method="POST">
+                                @csrf
+                                @method('PUT')
                                 <input type="text" name="name" value="{{ $location->name }}" 
                                        class="border-gray-300 dark:border-gray-600 rounded-md shadow-sm w-full">
-                            </td>
-                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">
                                 <button type="submit" 
-                                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">
                                     Sauvegarder
                                 </button>
-
-                                {{-- Bouton pour supprimer un emplacement --}}
-                                <form action="{{ route('locations.destroy', $location->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet emplacement ?');" class="inline-block">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" 
-                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                        Supprimer
-                                    </button>
-                                </form>
-                            </td>
-                        </form>
+                            </form>
+                        </td>
+                        {{-- Formulaire pour supprimer un emplacement --}}
+                        <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">
+                            <form action="{{ route('locations.destroy', $location->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet emplacement ?');" class="inline-block">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" 
+                                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                    Supprimer
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>

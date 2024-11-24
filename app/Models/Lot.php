@@ -11,30 +11,38 @@ class Lot extends Model
 
     protected $fillable = ['product_id', 'expiration_date', 'stock'];
 
+    // Relation avec les emplacements
+    public function locations()
+    {
+        return $this->belongsToMany(Location::class, 'lot_location')
+            ->withPivot('stock')
+            ->withTimestamps();
+    }
+
     // Relation avec le produit
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
-    // Relation pour les photos
+    // Relation avec les photos
     public function photos()
     {
         return $this->hasMany(LotPhoto::class);
     }
 
-    public function locations()
-    {
-        return $this->belongsToMany(Location::class, 'lot_location')->withPivot('stock')->withTimestamps();
-    }
-
+    // Méthode pour recalculer le stock total
     public function updateStockFromLocations()
     {
-        $totalStock = $this->locations->sum('pivot.stock');
-        $this->stock = $totalStock;
-        $this->save();
-
-        // Mettre à jour le stock du produit
+        // Calculer le stock total du lot à partir des emplacements
+        $totalStock = $this->locations->sum(function ($location) {
+            return $location->pivot->stock;
+        });
+    
+        // Mettre à jour le stock du lot
+        $this->update(['stock' => $totalStock]);
+    
+        // Mettre à jour le stock du produit associé
         $this->product->updateStockFromLots();
     }
 }

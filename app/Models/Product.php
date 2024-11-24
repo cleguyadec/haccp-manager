@@ -26,7 +26,6 @@ class Product extends Model
     public function updateStockFromLots()
     {
         $totalStock = $this->lots->sum('stock');
-        $this->stock = $totalStock;
-        $this->save();
+        $this->update(['stock' => $totalStock]);
     }
 }

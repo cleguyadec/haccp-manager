@@ -26,7 +26,7 @@ Route::put('/containers/{container}', [ContainerController::class, 'update'])->n
 Route::delete('/containers/{container}', [ContainerController::class, 'destroy'])->name('containers.destroy')->middleware(['auth']);
 
 //gestion des emplacements des lots
-Route::get('/lots/{lot}/locations', [LotController::class, 'manageLocations'])->name('lots.locations');
+Route::get('/lots/{lot}/locations', [LotController::class, 'manageLocations'])->name('lots.locations.manage');
 Route::post('/lots/{lot}/locations', [LotController::class, 'updateLocations'])->name('lots.locations.update');
 Route::post('/lots/{lot}/move-stock', [LotController::class, 'moveStock'])->name('lots.move-stock');
 
