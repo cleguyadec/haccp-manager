@@ -80,4 +80,25 @@ class LotController extends Controller
 
         return redirect()->route('lots.manage')->with('success', 'Lot mis à jour et stock ajusté.');
     }
+
+    public function edit(Lot $lot)
+    {
+        return view('lots.edit', compact('lot'));
+    }
+    
+    public function dashboard()
+    {
+        $expiredLots = Lot::with('product')
+            ->whereNotNull('expiration_date')
+            ->where('expiration_date', '<', now())
+            ->get();
+
+        $currentMonthLots = Lot::with('product')
+            ->whereNotNull('expiration_date')
+            ->whereYear('expiration_date', now()->year)
+            ->whereMonth('expiration_date', now()->month)
+            ->get();
+
+        return view('dashboard', compact('expiredLots', 'currentMonthLots'));
+    }
 }

@@ -81,10 +81,12 @@
                                     Supprimer
                                 </button>
                             </form>
-                                                <a href="{{ route('lots.create', $product->id) }}" 
-                       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Créer un lot
-                    </a>
+                            <form action="{{ route('lots.create', $product->id) }}" method="GET" class="inline-block">
+                                <button type="submit" 
+                                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                    Créer un lot
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @empty

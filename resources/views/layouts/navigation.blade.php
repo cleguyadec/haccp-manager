@@ -18,11 +18,11 @@
                     <x-nav-link :href="route('products.manage')" :active="request()->routeIs('products.manage')">
                         {{ __('Gestion des Produits') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('containers.manage')" :active="request()->routeIs('containers.manage')">
-                        {{ __('Gestion des Contenants') }}
-                    </x-nav-link>
                     <x-nav-link :href="route('lots.manage')" :active="request()->routeIs('lots.manage')">
                         {{ __('Gestion des Lots') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('containers.manage')" :active="request()->routeIs('containers.manage')">
+                        {{ __('Gestion des Contenants') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -82,11 +82,11 @@
             <x-responsive-nav-link :href="route('products.manage')" :active="request()->routeIs('products.manage')">
                 {{ __('Gestion des Produits') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('containers.manage')" :active="request()->routeIs('containers.manage')">
-                {{ __('Gestion des Contenants') }}
-            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('lots.manage')" :active="request()->routeIs('lots.manage')">
                 {{ __('Gestion des Lots') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('containers.manage')" :active="request()->routeIs('containers.manage')">
+                {{ __('Gestion des Contenants') }}
             </x-responsive-nav-link>
         </div>
 
