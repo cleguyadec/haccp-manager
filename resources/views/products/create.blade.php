@@ -13,7 +13,7 @@
         </div>
         <div class="mb-3">
             <label for="container_size" class="form-label">Taille du contenant</label>
-            <input type="text" class="form-control" id="container_size" name="container_size" value="{{ $product->container_size ?? old('container_size') }}" required>
+            <input type="text" class="form-control" id="container_size" name="container_size" value="{{ $product->container ?? old('container') }}" required>
         </div>
         <div class="mb-3">
             <label for="price" class="form-label">Prix</label>

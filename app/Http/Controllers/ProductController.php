@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Container;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -31,13 +32,14 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'container_size' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
+            'container_id' => 'required|exists:containers,id',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
         ]);
     
         Product::create($request->all());
-        return redirect()->route('products.manage')->with('success', 'Produit ajouté');
+    
+        return redirect()->route('products.manage')->with('success', 'Produit ajouté avec succès.');
     }
 
     /**
@@ -63,12 +65,13 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'container_size' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
+            'container_id' => 'required|exists:containers,id',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
         ]);
     
-        $product->update($request->all());
+        // Mise à jour du produit
+        $product->update($request->only(['name', 'container_id', 'price', 'stock']));
     
         return redirect()->route('products.manage')->with('success', 'Produit mis à jour avec succès.');
     }
@@ -85,20 +88,18 @@ class ProductController extends Controller
 
     public function manage(Request $request)
     {
-        // Rechercher et filtrer les produits
         $query = Product::query();
-
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
-
         if ($request->filled('filter')) {
-            $query->where('stock', '>=', $request->filter); // Exemple de filtre sur le stock
+            $query->where('stock', '>=', $request->filter);
         }
-
-        $products = $query->paginate(10); // Pagination pour une meilleure gestion de l'affichage
-
-        return view('products.manage', compact('products'));
+    
+        $products = $query->paginate(10);
+        $containers = Container::all(); // Charger les contenants
+    
+        return view('products.manage', compact('products', 'containers'));
     }
 
 }

@@ -9,6 +9,12 @@ class Product extends Model
 {
     use HasFactory;
 
-    // Champs autorisés pour l'assignation de masse
-    protected $fillable = ['name', 'container_size', 'price', 'stock'];
+    // Autorisez uniquement les champs nécessaires pour l'assignation de masse
+    protected $fillable = ['name', 'container_id', 'price', 'stock'];
+
+    // Relation avec le modèle Container
+    public function container()
+    {
+        return $this->belongsTo(Container::class);
+    }
 }

@@ -19,7 +19,7 @@
             @foreach ($products as $product)
                 <tr>
                     <td>{{ $product->name }}</td>
-                    <td>{{ $product->container_size }}</td>
+                    <td>{{ $product->container }}</td>
                     <td>{{ $product->price }} €</td>
                     <td>{{ $product->stock }}</td>
                     <td>

@@ -19,9 +19,14 @@
                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required>
                 </div>
                 <div>
-                    <label for="container_size" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Taille du contenant</label>
-                    <input type="text" id="container_size" name="container_size" 
-                           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required>
+                    <label for="container_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contenant</label>
+                    <select id="container_id" name="container_id"
+                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required>
+                        <option value="" disabled selected>Choisir un contenant</option>
+                        @foreach ($containers as $container)
+                            <option value="{{ $container->id }}">{{ $container->size }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div>
                     <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Prix</label>
@@ -30,8 +35,8 @@
                 </div>
                 <div>
                     <label for="stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Stock</label>
-                    <input type="number" id="stock" name="stock" 
-                           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required>
+                    <input type="number" id="stock" name="stock" value="0"
+                           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                 </div>
                 <button type="submit" 
                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -43,21 +48,6 @@
                 </button>
             </form>
         </div>
-
-        {{-- Formulaire de recherche et de filtrage --}}
-        <form method="GET" action="{{ route('products.manage') }}" class="flex space-x-4 mb-6">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Rechercher un produit"
-                   class="border-gray-300 dark:border-gray-600 rounded-md shadow-sm w-1/3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-            <select name="filter" 
-                    class="border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                <option value="">Filtrer par stock</option>
-                <option value="10" {{ request('filter') == '10' ? 'selected' : '' }}>10 unités ou plus</option>
-                <option value="50" {{ request('filter') == '50' ? 'selected' : '' }}>50 unités ou plus</option>
-            </select>
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Appliquer
-            </button>
-        </form>
 
         {{-- Liste des produits --}}
         <table class="table-auto w-full border-collapse border border-gray-300 dark:border-gray-600 mb-6">
@@ -74,7 +64,7 @@
                 @forelse ($products as $product)
                     <tr class="bg-white dark:bg-gray-800">
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->name }}</td>
-                        <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->container_size }}</td>
+                        <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->container->size }}</td>
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->price }} €</td>
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->stock }}</td>
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">
@@ -100,6 +90,7 @@
             </tbody>
         </table>
 
+        {{-- Modal pour modifier un produit --}}
         <div id="editModal" class="hidden fixed z-10 inset-0 overflow-y-auto bg-gray-900 bg-opacity-50">
             <div class="flex items-center justify-center min-h-screen">
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
@@ -114,9 +105,13 @@
                                    class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required>
                         </div>
                         <div>
-                            <label for="editContainerSize" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Taille du contenant</label>
-                            <input type="text" id="editContainerSize" name="container_size" 
-                                   class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required>
+                            <label for="editContainerId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contenant</label>
+                            <select id="editContainerId" name="container_id"
+                                    class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required>
+                                @foreach ($containers as $container)
+                                    <option value="{{ $container->id }}">{{ $container->size }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div>
                             <label for="editPrice" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Prix</label>
@@ -140,7 +135,6 @@
                 </div>
             </div>
         </div>
-        
 
         {{-- Pagination --}}
         {{ $products->links() }}
@@ -148,22 +142,18 @@
 
     <script>
         function toggleAddForm() {
+            console.log('toggleAddForm exécuté');
             const addForm = document.getElementById('addForm');
             addForm.classList.toggle('hidden');
         }
 
         function openEditModal(product) {
-            // Remplir les champs du formulaire de modification avec les données du produit
             document.getElementById('editProductId').value = product.id;
             document.getElementById('editName').value = product.name;
-            document.getElementById('editContainerSize').value = product.container_size;
+            document.getElementById('editContainerId').value = product.container_id;
             document.getElementById('editPrice').value = product.price;
             document.getElementById('editStock').value = product.stock;
-
-            // Mettre à jour l'action du formulaire de modification
             document.getElementById('editForm').action = `/products/${product.id}`;
-
-            // Afficher le modal
             document.getElementById('editModal').classList.remove('hidden');
         }
 
@@ -171,5 +161,4 @@
             document.getElementById('editModal').classList.add('hidden');
         }
     </script>
-
 </x-app-layout>
