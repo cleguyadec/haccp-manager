@@ -34,6 +34,14 @@
                                     Gérer les Images
                                 </button>
                             </form>
+                            
+                            {{-- Bouton pour gérer les emplacements --}}
+                            <form action="{{ route('lots.locations', $lot->id) }}" method="GET" class="inline-block">
+                                <button type="submit" 
+                                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                    Gérer les Emplacements
+                                </button>
+                            </form>
                         
                             {{-- Formulaire pour supprimer le lot --}}
                             <form action="{{ route('lots.destroy', $lot->id) }}" method="POST" class="inline-block">
@@ -44,6 +52,7 @@
                                     Supprimer
                                 </button>
                             </form>
+
                         </td>
                     </tr>
                 @endforeach

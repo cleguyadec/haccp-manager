@@ -22,5 +22,20 @@ class Lot extends Model
     {
         return $this->hasMany(LotPhoto::class);
     }
+
+    public function locations()
+    {
+        return $this->belongsToMany(Location::class, 'lot_location')->withPivot('stock')->withTimestamps();
+    }
+
+    public function updateStockFromLocations()
+    {
+        $totalStock = $this->locations->sum('pivot.stock');
+        $this->stock = $totalStock;
+        $this->save();
+
+        // Mettre à jour le stock du produit
+        $this->product->updateStockFromLots();
+    }
 }
 

@@ -21,6 +21,9 @@
                     <x-nav-link :href="route('lots.manage')" :active="request()->routeIs('lots.manage')">
                         {{ __('Gestion des Lots') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('locations.manage')" :active="request()->routeIs('locations.manage')">
+                        {{ __('Gestion des Emplacements') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('containers.manage')" :active="request()->routeIs('containers.manage')">
                         {{ __('Gestion des Contenants') }}
                     </x-nav-link>
@@ -84,6 +87,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('lots.manage')" :active="request()->routeIs('lots.manage')">
                 {{ __('Gestion des Lots') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('locations.manage')" :active="request()->routeIs('locations.manage')">
+                {{ __('Gestion des Emplacements') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('containers.manage')" :active="request()->routeIs('containers.manage')">
                 {{ __('Gestion des Contenants') }}

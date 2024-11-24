@@ -22,4 +22,11 @@ class Product extends Model
     {
         return $this->hasMany(Lot::class);
     }
+
+    public function updateStockFromLots()
+    {
+        $totalStock = $this->lots->sum('stock');
+        $this->stock = $totalStock;
+        $this->save();
+    }
 }

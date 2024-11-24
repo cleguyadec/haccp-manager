@@ -4,11 +4,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LotController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\LotImageController;
 use App\Http\Controllers\ContainerController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Route::get('/dashboard', function () {
@@ -23,6 +24,18 @@ Route::get('/containers/manage', [ContainerController::class, 'manage'])->name('
 Route::post('/containers', [ContainerController::class, 'store'])->name('containers.store')->middleware(['auth']);
 Route::put('/containers/{container}', [ContainerController::class, 'update'])->name('containers.update')->middleware(['auth']);
 Route::delete('/containers/{container}', [ContainerController::class, 'destroy'])->name('containers.destroy')->middleware(['auth']);
+
+//gestion des emplacements des lots
+Route::get('/lots/{lot}/locations', [LotController::class, 'manageLocations'])->name('lots.locations');
+Route::post('/lots/{lot}/locations', [LotController::class, 'updateLocations'])->name('lots.locations.update');
+Route::post('/lots/{lot}/move-stock', [LotController::class, 'moveStock'])->name('lots.move-stock');
+
+// Route pour gérer les emplacements
+Route::get('/locations/manage', [LocationController::class, 'index'])->name('locations.manage');
+Route::post('/locations/manage', [LocationController::class, 'store'])->name('locations.store');
+Route::delete('/locations/{location}', [LocationController::class, 'destroy'])->name('locations.destroy');
+Route::put('/locations/{location}', [LocationController::class, 'update'])->name('locations.update');
+
 
 // Gestion des lots
 Route::get('/lots/manage', [LotController::class, 'manage'])->name('lots.manage');
