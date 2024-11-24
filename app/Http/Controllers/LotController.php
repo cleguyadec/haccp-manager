@@ -12,14 +12,9 @@ class LotController extends Controller
 {
     public function manage(Request $request)
     {
-<<<<<<< HEAD
-        // Récupérer l'ID du produit depuis la requête
-        $productId = $request->input('product_id');
-=======
         // Récupérer l'ID du produit et le mot-clé de recherche depuis la requête
         $productId = $request->input('product_id');
         $search = $request->input('search');
->>>>>>> dev
     
         // Construire la requête pour récupérer les lots
         $lotsQuery = Lot::query();
@@ -29,8 +24,6 @@ class LotController extends Controller
             $lotsQuery->where('product_id', $productId);
         }
     
-<<<<<<< HEAD
-=======
         if ($search) {
             // Rechercher par ID du lot, date de péremption ou nom du produit
             $lotsQuery->where(function ($query) use ($search) {
@@ -42,7 +35,6 @@ class LotController extends Controller
             });
         }
     
->>>>>>> dev
         // Récupérer les lots et le produit (si un ID est passé)
         $lots = $lotsQuery->get();
         $product = $productId ? Product::find($productId) : null;
@@ -50,10 +42,7 @@ class LotController extends Controller
         return view('lots.manage', [
             'lots' => $lots,
             'product' => $product,
-<<<<<<< HEAD
-=======
             'search' => $search,
->>>>>>> dev
         ]);
     }
     
