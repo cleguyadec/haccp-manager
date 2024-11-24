@@ -10,10 +10,27 @@ use Illuminate\Http\Request;
 
 class LotController extends Controller
 {
-    public function manage()
+    public function manage(Request $request)
     {
-        $lots = Lot::with('product')->get();
-        return view('lots.manage', compact('lots'));
+        // Récupérer l'ID du produit depuis la requête
+        $productId = $request->input('product_id');
+    
+        // Construire la requête pour récupérer les lots
+        $lotsQuery = Lot::query();
+    
+        if ($productId) {
+            // Filtrer les lots par produit
+            $lotsQuery->where('product_id', $productId);
+        }
+    
+        // Récupérer les lots et le produit (si un ID est passé)
+        $lots = $lotsQuery->get();
+        $product = $productId ? Product::find($productId) : null;
+    
+        return view('lots.manage', [
+            'lots' => $lots,
+            'product' => $product,
+        ]);
     }
 
     public function create(Product $product)

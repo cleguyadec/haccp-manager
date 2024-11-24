@@ -81,13 +81,22 @@
                                     Supprimer
                                 </button>
                             </form>
+                            
                             <form action="{{ route('lots.create', $product->id) }}" method="GET" class="inline-block">
                                 <button type="submit" 
                                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                     Créer un lot
                                 </button>
                             </form>
-                        </td>
+                            <form action="{{ route('lots.manage') }}" method="GET" class="inline">
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <button type="submit" 
+                                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                    Gérer les Lots
+                                </button>
+                            </form>
+                             </form>
+                        </td>                        
                     </tr>
                 @empty
                     <tr>
