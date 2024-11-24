@@ -36,7 +36,7 @@ class LotController extends Controller
         }
     
         // Récupérer les lots et le produit (si un ID est passé)
-        $lots = $lotsQuery->get();
+        $lots = $lotsQuery->paginate(10); // 10 lots par page
         $product = $productId ? Product::find($productId) : null;
     
         return view('lots.manage', [

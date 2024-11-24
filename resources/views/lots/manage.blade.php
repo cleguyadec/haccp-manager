@@ -76,5 +76,9 @@
                 @endforeach
             </tbody>
         </table>
+               {{-- Liens de pagination --}}
+               <div class="mt-4">
+                {{ $lots->links() }}
+            </div>
     </div>
 </x-app-layout>
