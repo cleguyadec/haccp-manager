@@ -17,4 +17,9 @@ class Product extends Model
     {
         return $this->belongsTo(Container::class);
     }
+
+    public function lots()
+    {
+        return $this->hasMany(Lot::class);
+    }
 }

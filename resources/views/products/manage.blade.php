@@ -72,6 +72,7 @@
                                     class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
                                 Modifier
                             </button>
+                            
                             <form action="{{ route('products.destroy', $product) }}" method="POST" class="inline-block">
                                 @csrf
                                 @method('DELETE')
@@ -80,6 +81,10 @@
                                     Supprimer
                                 </button>
                             </form>
+                                                <a href="{{ route('lots.create', $product->id) }}" 
+                       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Créer un lot
+                    </a>
                         </td>
                     </tr>
                 @empty

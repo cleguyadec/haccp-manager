@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LotController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ContainerController;
@@ -22,6 +23,10 @@ Route::post('/containers', [ContainerController::class, 'store'])->name('contain
 Route::put('/containers/{container}', [ContainerController::class, 'update'])->name('containers.update')->middleware(['auth']);
 Route::delete('/containers/{container}', [ContainerController::class, 'destroy'])->name('containers.destroy')->middleware(['auth']);
 
+Route::get('/lots/manage', [LotController::class, 'manage'])->name('lots.manage');
+Route::get('/lots/create/{product}', [LotController::class, 'create'])->name('lots.create');
+Route::post('/lots/{product}', [LotController::class, 'store'])->name('lots.store');
+Route::delete('/lots/{lot}', [LotController::class, 'destroy'])->name('lots.destroy');
 
 
 Route::middleware('auth')->group(function () {
