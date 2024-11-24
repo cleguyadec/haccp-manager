@@ -95,8 +95,7 @@
                                     Gérer les Lots
                                 </button>
                             </form>
-                             </form>
-                        </td>                        
+                        </td>
                     </tr>
                 @empty
                     <tr>
