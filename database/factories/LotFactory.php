@@ -27,7 +27,7 @@ class LotFactory extends Factory
             $locations = Location::all();
             foreach ($locations as $location) {
                 $lot->locations()->attach($location->id, [
-                    'stock' => $location->name === 'maison' ? $lot->stock : 0,
+                    'stock' => $location->name === 'Maison' ? $lot->stock : 0,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

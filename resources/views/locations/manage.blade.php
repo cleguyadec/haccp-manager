@@ -44,8 +44,8 @@
                 @foreach ($locations as $location)
                     <tr class="bg-white dark:bg-gray-800">
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2">
-                            {{-- Vérifier si l'emplacement est "maison" --}}
-                            @if ($location->name === 'maison')
+                            {{-- Vérifier si l'emplacement est "Maison" --}}
+                            @if ($location->name === 'Maison')
                                 <span class="text-gray-500 dark:text-gray-400">{{ $location->name }}</span>
                             @else
                                 {{-- Formulaire pour éditer un emplacement --}}
@@ -62,8 +62,8 @@
                             @endif
                         </td>
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">
-                            {{-- Désactiver la suppression pour "maison" --}}
-                            @if ($location->name !== 'maison')
+                            {{-- Désactiver la suppression pour "Maison" --}}
+                            @if ($location->name !== 'Maison')
                                 <form action="{{ route('locations.destroy', $location->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet emplacement ?');" class="inline-block">
                                     @csrf
                                     @method('DELETE')

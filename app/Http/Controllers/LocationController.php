@@ -50,14 +50,14 @@ class LocationController extends Controller
 
     public function destroy(Location $location)
     {
-        // Récupérer l'emplacement "maison"
-        $defaultLocation = Location::where('name', 'maison')->first();
+        // Récupérer l'emplacement "Maison"
+        $defaultLocation = Location::where('name', 'Maison')->first();
     
         if (!$defaultLocation) {
-            return redirect()->route('locations.manage')->with('error', 'L\'emplacement "maison" n\'existe pas. Impossible de supprimer cet emplacement.');
+            return redirect()->route('locations.manage')->with('error', 'L\'emplacement "Maison" n\'existe pas. Impossible de supprimer cet emplacement.');
         }
     
-        // Déplacer les lots associés vers "maison"
+        // Déplacer les lots associés vers "Maison"
         foreach ($location->lots as $lot) {
             $existingStockInMaison = $lot->locations()->where('location_id', $defaultLocation->id)->first()->pivot->stock ?? 0;
     
@@ -72,7 +72,7 @@ class LocationController extends Controller
         // Supprimer l'emplacement
         $location->delete();
     
-        return redirect()->route('locations.manage')->with('success', 'Emplacement supprimé avec succès. Les lots ont été déplacés vers "maison".');
+        return redirect()->route('locations.manage')->with('success', 'Emplacement supprimé avec succès. Les lots ont été déplacés vers "Maison".');
     }
 }
 

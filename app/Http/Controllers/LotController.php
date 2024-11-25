@@ -66,7 +66,7 @@ class LotController extends Controller
             'stock' => $request->stock,
         ]);
     
-        // Associe l'emplacement "maison" avec le stock initial
+        // Associe l'emplacement "Maison" avec le stock initial
         $defaultLocation = Location::firstOrCreate(['name' => 'Maison']);
         $lot->locations()->attach($defaultLocation->id, ['stock' => $request->stock]);
 

@@ -11,8 +11,8 @@ class ProductLotSeeder extends Seeder
 {
     public function run()
     {
-        // Vérifiez ou créez des emplacements, y compris "maison"
-        $defaultLocations = ['maison', 'entrepôt A', 'entrepôt B'];
+        // Vérifiez ou créez des emplacements, y compris "Maison"
+        $defaultLocations = ['Maison', 'entrepôt A', 'entrepôt B'];
         foreach ($defaultLocations as $locationName) {
             Location::firstOrCreate(['name' => $locationName], [
                 'created_at' => now(),
