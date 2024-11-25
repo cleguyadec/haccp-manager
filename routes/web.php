@@ -19,6 +19,8 @@ Route::get('/dashboard', function () {
 
 Route::get('/products/manage', [ProductController::class, 'manage'])->name('products.manage')->middleware(['auth']);
 Route::resource('products', ProductController::class)->middleware('auth');
+Route::get('/products', [ProductController::class, 'publicIndex'])->name('products.public');
+
 
 Route::get('/containers/manage', [ContainerController::class, 'manage'])->name('containers.manage')->middleware(['auth']);
 Route::post('/containers', [ContainerController::class, 'store'])->name('containers.store')->middleware(['auth']);

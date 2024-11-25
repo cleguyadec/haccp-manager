@@ -32,18 +32,29 @@
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                    {{ __('  Forgot your password?') }}
+        <!-- Actions -->
+        <div class="flex flex-col gap-4">
+            <button type="submit" class="block text-center bg-blue-600 hover:bg-blue-500 text-gray-800 font-medium py-2 px-4 rounded-md">
+                {{ __('Connexion') }}
+            </button>
+
+            @if (Route::has('register'))
+                <a href="{{ route('register') }}" class="block text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md">
+                    {{ __('Créer un compte') }}
                 </a>
             @endif
-            <x-primary-button class="ms-3">
-                {{ __('Register here') }}
-            </x-primary-button>
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
+
+            @if (Route::has('products.public'))
+                <a href="{{ route('products.public') }}" class="block text-center bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-md">
+                    {{ __('Voir les produits') }}
+                </a>
+            @endif
+
+            @if (Route::has('password.request'))
+                <a href="{{ route('password.request') }}" class="block text-center text-sm text-gray-600 dark:text-gray-400 hover:underline">
+                    {{ __('Mot de passe oublié ?') }}
+                </a>
+            @endif
         </div>
     </form>
 </x-guest-layout>
