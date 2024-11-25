@@ -30,15 +30,16 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'container_id' => 'required|exists:containers,id',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'description' => 'nullable|string|max:1000',
+            'is_sterilized' => 'boolean',
         ]);
     
-        Product::create($request->all());
-    
+        Product::create($validated);
         return redirect()->route('products.manage')->with('success', 'Produit ajouté avec succès.');
     }
 
@@ -68,11 +69,14 @@ class ProductController extends Controller
             'container_id' => 'required|exists:containers,id',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'description' => 'nullable|string',
+            'is_sterilized' => 'boolean',
         ]);
     
         // Mise à jour du produit
-        $product->update($request->only(['name', 'container_id', 'price', 'stock']));
-    
+        $product->update($request->only(['name', 'container_id', 'price', 'stock', 'description', 'is_sterilized']));
+        //dd($request->all());
+
         return redirect()->route('products.manage')->with('success', 'Produit mis à jour avec succès.');
     }
 
@@ -88,32 +92,27 @@ class ProductController extends Controller
 
     public function manage(Request $request)
     {
-        // Récupérer le mot-clé de recherche depuis la requête
         $search = $request->input('search');
     
-        // Construire la requête pour récupérer les produits
         $productsQuery = Product::query();
     
         if ($search) {
-            // Rechercher par nom, taille de contenant ou d'autres champs pertinents
             $productsQuery->where('name', 'like', "%$search%")
+                          ->orWhere('description', 'like', "%$search%")
                           ->orWhereHas('container', function ($query) use ($search) {
                               $query->where('size', 'like', "%$search%");
                           });
         }
     
-        // Récupérer les produits avec pagination
-        $products = $productsQuery->paginate(10);
-    
-        // Récupérer les conteneurs (pour un dropdown ou une autre fonctionnalité)
+        $products = $productsQuery->paginate(10); // Pagination ajoutée
         $containers = Container::all();
-    
         return view('products.manage', [
             'products' => $products,
             'search' => $search,
-            'containers' => $containers, // Transmettre les conteneurs à la vue
+            'containers' => $containers,
         ]);
     }
+    
     
     
 

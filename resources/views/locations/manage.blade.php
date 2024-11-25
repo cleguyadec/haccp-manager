@@ -44,8 +44,8 @@
                 @foreach ($locations as $location)
                     <tr class="bg-white dark:bg-gray-800">
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2">
-                            {{-- Vérifier si l'emplacement est "maison" --}}
-                            @if ($location->name === 'maison')
+                            {{-- Vérifier si l'emplacement est "Maison" --}}
+                            @if ($location->name === 'Maison')
                                 <span class="text-gray-500 dark:text-gray-400">{{ $location->name }}</span>
                             @else
                                 {{-- Formulaire pour éditer un emplacement --}}
@@ -62,23 +62,47 @@
                             @endif
                         </td>
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">
-                            {{-- Désactiver la suppression pour "maison" --}}
-                            @if ($location->name !== 'maison')
-                                <form action="{{ route('locations.destroy', $location->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet emplacement ?');" class="inline-block">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" 
-                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                        Supprimer
-                                    </button>
-                                </form>
-                            @else
-                                <span class="text-gray-500 dark:text-gray-400">Action non disponible</span>
-                            @endif
+                            {{-- Désactiver la suppression pour "Maison" --}}
+                            @if ($location->name !== 'Maison')
+                            <form action="{{ route('locations.destroy', $location->id) }}" method="POST" class="inline-block delete-location-form">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" onclick="confirmLocationDeletion(this)"
+                                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                    Supprimer
+                                </button>
+                            </form>
+                        @else
+                            <span class="text-gray-500 dark:text-gray-400">Action non disponible</span>
+                        @endif
+                        
                         </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
+
+<script>
+    function confirmLocationDeletion(button) {
+    Swal.fire({
+        title: 'Êtes-vous sûr ?',
+        text: "Cette action est irréversible.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Oui, supprimer',
+        cancelButtonText: 'Annuler'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Soumettre le formulaire parent si l'utilisateur confirme
+            button.closest('form').submit();
+        }
+    });
+}
+</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </x-app-layout>

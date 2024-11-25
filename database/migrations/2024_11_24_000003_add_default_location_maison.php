@@ -14,10 +14,10 @@ class AddDefaultLocationMaison extends Migration
      */
     public function up()
     {
-        // Vérifie si l'emplacement "maison" existe déjà pour éviter les doublons
-        if (!DB::table('locations')->where('name', 'maison')->exists()) {
+        // Vérifie si l'emplacement "Maison" existe déjà pour éviter les doublons
+        if (!DB::table('locations')->where('name', 'Maison')->exists()) {
             DB::table('locations')->insert([
-                'name' => 'maison',
+                'name' => 'Maison',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -31,7 +31,7 @@ class AddDefaultLocationMaison extends Migration
      */
     public function down()
     {
-        // Supprime l'emplacement "maison" lors du rollback
-        DB::table('locations')->where('name', 'maison')->delete();
+        // Supprime l'emplacement "Maison" lors du rollback
+        DB::table('locations')->where('name', 'Maison')->delete();
     }
 }
