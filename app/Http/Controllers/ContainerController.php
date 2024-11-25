@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Container;
 use Illuminate\Http\Request;
 
@@ -32,4 +33,24 @@ class ContainerController extends Controller
         $container->delete();
         return redirect()->route('containers.manage')->with('success', 'Contenant supprimé avec succès.');
     }
+
+    public function destroyWithReplacement(Request $request)
+{
+    $containerId = $request->input('container_id');
+    $replacementId = $request->input('replacement_id');
+
+    // Vérifiez que les deux contenants existent
+    $container = Container::findOrFail($containerId);
+    $replacement = Container::findOrFail($replacementId);
+
+    // Mettre à jour les produits pour utiliser le contenant de remplacement
+    Product::where('container_id', $container->id)
+           ->update(['container_id' => $replacement->id]);
+
+    // Supprimer le contenant initial
+    $container->delete();
+
+    return response()->json(['message' => 'Contenant supprimé avec succès.'], 200);
+}
+
 }

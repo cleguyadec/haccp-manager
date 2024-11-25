@@ -46,14 +46,10 @@
                                     class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
                                 Modifier
                             </button>
-                            <form action="{{ route('containers.destroy', $container) }}" method="POST" class="inline-block">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                    Supprimer
-                                </button>
-                            </form>
+                            <button onclick="confirmContainerDeletion({{ $container->id }}, '{{ $container->size }}')"
+                                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            Supprimer
+                            </button>
                         </td>
                     </tr>
                 @empty
@@ -106,5 +102,57 @@
         function closeEditModal() {
             document.getElementById('editModal').classList.add('hidden');
         }
+
+        function confirmContainerDeletion(containerId, containerSize) {
+    Swal.fire({
+        title: `Supprimer "${containerSize}"`,
+        text: "Veuillez choisir un contenant de remplacement pour les produits existants.",
+        icon: "warning",
+        input: "select",
+        inputOptions: {
+            @foreach ($containers as $replacement)
+                @if ($replacement->id !== $container->id)
+                    {{ $replacement->id }}: "{{ $replacement->size }}",
+                @endif
+            @endforeach
+        },
+        inputPlaceholder: "Sélectionnez un contenant",
+        showCancelButton: true,
+        confirmButtonText: "Supprimer",
+        cancelButtonText: "Annuler",
+        preConfirm: (replacementId) => {
+            if (!replacementId) {
+                Swal.showValidationMessage("Vous devez sélectionner un contenant de remplacement.");
+            }
+            return replacementId;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const replacementId = result.value;
+            // Envoyer une requête POST au serveur pour gérer la suppression
+            fetch(`{{ route('containers.destroyWithReplacement') }}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    container_id: containerId,
+                    replacement_id: replacementId
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    Swal.fire("Supprimé!", "Le contenant a été supprimé avec succès.", "success")
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire("Erreur!", "Une erreur s'est produite lors de la suppression.", "error");
+                }
+            });
+        }
+    });
+}
+
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </x-app-layout>
