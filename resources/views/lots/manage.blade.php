@@ -8,6 +8,12 @@
                 </h2>
             </div>
         @endif
+        @if ($product)
+            <a href="{{ route('lots.manage') }}" 
+            class="text-blue-500 hover:underline">
+                Effacer le filtre
+            </a>
+        @endif
         <div class="mb-4">
             <form action="{{ route('lots.manage') }}" method="GET" class="flex items-center space-x-4">
                 <input type="hidden" name="product_id" value="{{ $product->id ?? '' }}">
@@ -78,7 +84,7 @@
         </table>
                {{-- Liens de pagination --}}
                <div class="mt-4">
-                {{ $lots->links() }}
+                {{ $lots->appends(request()->query())->links() }}
             </div>
     </div>
 </x-app-layout>
