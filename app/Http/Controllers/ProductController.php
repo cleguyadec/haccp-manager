@@ -80,6 +80,23 @@ class ProductController extends Controller
         return redirect()->route('products.manage')->with('success', 'Produit mis à jour avec succès.');
     }
 
+    public function publicIndex(Request $request)
+    {
+        $query = Product::where('stock', '>', 0);
+    
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%$search%")
+                  ->orWhere('description', 'LIKE', "%$search%");
+            });
+        }
+    
+        $products = $query->paginate(10); // Limité à 10 produits par page
+    
+        return view('products.public', compact('products'));
+    }
+    
     /**
      * Remove the specified resource from storage.
      */
