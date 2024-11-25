@@ -81,7 +81,8 @@ class LotController extends Controller
             }
         }
     
-        return redirect()->route('lots.manage')->with('success', 'Lot créé avec succès et stock mis à jour.');
+        return redirect()->route('lots.manage', ['product_id' => $lot->product_id])
+        ->with('success', 'Lot mis à jour avec succès.');
     }
 
     public function destroy(Lot $lot)
@@ -108,7 +109,8 @@ class LotController extends Controller
                 'expiration_date' => $request->input('expiration_date'),
             ]);
     
-            return redirect()->route('lots.manage')->with('success', 'Date de péremption mise à jour avec succès.');
+            return redirect()->route('lots.manage', ['product_id' => $lot->product_id])
+            ->with('success', 'Lot mis à jour avec succès.');
         }
     
         // Sinon, gérer le transfert de stock
@@ -213,8 +215,8 @@ class LotController extends Controller
         // Recalculer les stocks du lot et du produit
         $lot->updateStockFromLocations();
     
-        return redirect()->route('lots.locations.manage', $lot->id)->with('success', 'Stock mis à jour avec succès.');
-    }
+        return redirect()->route('lots.manage', ['product_id' => $lot->product_id])
+        ->with('success', 'Lot mis à jour avec succès.');    }
     
     
     
