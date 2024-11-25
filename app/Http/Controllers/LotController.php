@@ -67,7 +67,7 @@ class LotController extends Controller
         ]);
     
         // Associe l'emplacement "maison" avec le stock initial
-        $defaultLocation = Location::firstOrCreate(['name' => 'maison']);
+        $defaultLocation = Location::firstOrCreate(['name' => 'Maison']);
         $lot->locations()->attach($defaultLocation->id, ['stock' => $request->stock]);
 
         // Met à jour le stock du produit
@@ -174,10 +174,10 @@ class LotController extends Controller
 
     public function manageLocations(Lot $lot)
     {
-        $locations = $lot->locations; // Récupère les emplacements associés au lot
-        $allLocations = Location::all(); // Récupère tous les emplacements pour affichage
+        $locations = Location::all(); // Tous les emplacements
+        $lotLocations = $lot->locations; // Emplacements liés au lot
     
-        return view('lots.locations', compact('lot', 'locations', 'allLocations'));
+        return view('lots.locations', compact('lot', 'locations', 'lotLocations'));
     }
 
     public function updateLocations(Request $request, Lot $lot)
@@ -280,32 +280,35 @@ class LotController extends Controller
             'amount' => 'required|integer|min:1',
         ]);
     
-        // Corrige la requête en qualifiant explicitement les colonnes
-        $sourceLocation = $lot->locations()->where('locations.id', $request->source_location_id)->first();
-        $destinationLocation = $lot->locations()->where('locations.id', $request->destination_location_id)->first();
+        $sourceLocation = $lot->locations()->where('location_id', $request->source_location_id)->first();
+        $destinationLocation = $lot->locations()->where('location_id', $request->destination_location_id)->first();
     
-        if (!$sourceLocation || !$destinationLocation) {
-            return redirect()->back()->with('error', 'Emplacement source ou destination invalide.');
-        }
-    
-        if ($sourceLocation->pivot->stock < $request->amount) {
+        if (!$sourceLocation || $sourceLocation->pivot->stock < $request->amount) {
             return redirect()->back()->with('error', 'Stock insuffisant dans l\'emplacement source.');
         }
     
-        // Mise à jour des stocks
+        // Déduire le stock de l'emplacement source
         $lot->locations()->updateExistingPivot($request->source_location_id, [
             'stock' => $sourceLocation->pivot->stock - $request->amount,
         ]);
     
-        $lot->locations()->updateExistingPivot($request->destination_location_id, [
-            'stock' => $destinationLocation->pivot->stock + $request->amount,
-        ]);
+        // Ajouter le stock à l'emplacement de destination
+        if ($destinationLocation) {
+            // Mise à jour si l'emplacement existe déjà pour ce lot
+            $lot->locations()->updateExistingPivot($request->destination_location_id, [
+                'stock' => $destinationLocation->pivot->stock + $request->amount,
+            ]);
+        } else {
+            // Créer une nouvelle association si l'emplacement de destination n'existe pas
+            $lot->locations()->attach($request->destination_location_id, [
+                'stock' => $request->amount,
+            ]);
+        }
     
-        // Recalculer le stock du lot et du produit
-        $lot->updateStockFromLocations();
-    
-        return redirect()->route('lots.locations.manage', $lot->id)->with('success', 'Stock transféré avec succès.');
+        return redirect()->route('lots.locations.manage', $lot->id)
+                         ->with('success', 'Stock transféré avec succès.');
     }
+    
 
 
 

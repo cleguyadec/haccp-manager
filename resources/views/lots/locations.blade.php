@@ -52,15 +52,20 @@
                     <form id="transferForm" action="{{ route('lots.locations.transfer', $lot->id) }}" method="POST">
                         @csrf
                         <input type="hidden" id="sourceLocationId" name="source_location_id">
-                        <div class="mb-4">
-                            <label for="destinationLocation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nouvel Emplacement</label>
-                            <select id="destinationLocation" name="destination_location_id" 
-                                    class="border-gray-300 dark:border-gray-600 rounded-md shadow-sm w-full">
-                                @foreach ($locations as $destination)
-                                    <option value="{{ $destination->id }}">{{ $destination->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <select id="destinationLocation" name="destination_location_id" 
+                        class="border-gray-300 dark:border-gray-600 rounded-md shadow-sm w-full" required>
+                    <optgroup label="Emplacements liés au lot">
+                        @foreach ($lotLocations as $location)
+                            <option value="{{ $location->id }}">{{ $location->name }}</option>
+                        @endforeach
+                    </optgroup>
+                    <optgroup label="Tous les autres emplacements">
+                        @foreach ($locations->diff($lotLocations) as $location)
+                            <option value="{{ $location->id }}">{{ $location->name }}</option>
+                        @endforeach
+                    </optgroup>
+                </select>
+                        
                         <div class="mb-4">
                             <label for="transferAmount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Quantité à Transférer</label>
                             <input type="number" id="transferAmount" name="amount" 
