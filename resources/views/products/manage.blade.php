@@ -2,14 +2,12 @@
     <div class="container mx-auto p-6">
         <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Gestion des Produits</h1>
 
+        {{-- Formulaire de recherche --}}
         <div class="mb-4">
             <form action="{{ route('products.manage') }}" method="GET" class="flex items-center space-x-4">
-                <!-- Champ de recherche -->
                 <input type="text" name="search" value="{{ $search ?? '' }}" 
                        placeholder="Rechercher un produit..."
                        class="border-gray-300 dark:border-gray-600 rounded-md shadow-sm w-1/3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                
-                <!-- Bouton de recherche -->
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Rechercher
                 </button>
@@ -22,7 +20,7 @@
             Ajouter un produit
         </button>
 
-        {{-- Formulaire pour ajouter un produit (masqué par défaut) --}}
+        {{-- Formulaire pour ajouter un produit --}}
         <div id="addForm" class="hidden mb-6">
             <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Ajouter un Produit</h2>
             <form action="{{ route('products.store') }}" method="POST" class="space-y-4 bg-gray-100 dark:bg-gray-800 p-4 rounded-md">
@@ -52,6 +50,21 @@
                     <input type="number" id="stock" name="stock" value="0"
                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                 </div>
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                    <textarea id="description" name="description" rows="3"
+                              class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ old('description') }}</textarea>
+                </div>
+                <div class="flex items-center">
+                    <!-- Champ caché pour envoyer "0" si la case n'est pas cochée -->
+                    <input type="hidden" name="is_sterilized" value="0">
+                    <!-- Case à cocher -->
+                    <input type="checkbox" id="is_sterilized" name="is_sterilized" value="1"
+                           class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-600"
+                           {{ old('is_sterilized', $product->is_sterilized ?? false) ? 'checked' : '' }}>
+                    <label for="is_sterilized" class="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Produit Stérilisé</label>
+                </div>
+                
                 <button type="submit" 
                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Ajouter
@@ -71,6 +84,8 @@
                     <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Contenant</th>
                     <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Prix</th>
                     <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Stock</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Description</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Stérilisé</th>
                     <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Actions</th>
                 </tr>
             </thead>
@@ -81,20 +96,13 @@
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->container->size }}</td>
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->price }} €</td>
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->stock }}</td>
+                        <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->description }}</td>
+                        <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->is_sterilized ? 'Oui' : 'Non' }}</td>
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">
-                            <button onclick="openEditModal({{ $product }})"
+                            <button onclick="openEditModal({{ $product }})" 
                                     class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
                                 Modifier
                             </button>
-                            
-                            <form action="{{ route('products.destroy', $product) }}" method="POST" class="inline-block">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                    Supprimer
-                                </button>
-                            </form>
                             <form action="{{ route('lots.create', $product->id) }}" method="GET" class="inline-block">
                                 <button type="submit" 
                                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -108,15 +116,26 @@
                                     Gérer les Lots
                                 </button>
                             </form>
+                            <form action="{{ route('products.destroy', $product) }}" method="POST" class="inline-block">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" 
+                                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                    Supprimer
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Aucun produit trouvé.</td>
+                        <td colspan="7" class="text-center border border-gray-300 dark:border-gray-600 px-4 py-2">Aucun produit trouvé.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
+
+        {{-- Pagination --}}
+        {{ $products->links() }}
 
         {{-- Modal pour modifier un produit --}}
         <div id="editModal" class="hidden fixed z-10 inset-0 overflow-y-auto bg-gray-900 bg-opacity-50">
@@ -128,14 +147,14 @@
                         @method('PUT')
                         <input type="hidden" id="editProductId" name="id">
                         <div>
-                            <label for="editName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nom du produit</label>
-                            <input type="text" id="editName" name="name" 
-                                   class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required>
+                            <label for="editName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nom</label>
+                            <input type="text" id="editName" name="name" required
+                                   class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
                         <div>
                             <label for="editContainerId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contenant</label>
-                            <select id="editContainerId" name="container_id"
-                                    class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required>
+                            <select id="editContainerId" name="container_id" required
+                                    class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach ($containers as $container)
                                     <option value="{{ $container->id }}">{{ $container->size }}</option>
                                 @endforeach
@@ -143,16 +162,28 @@
                         </div>
                         <div>
                             <label for="editPrice" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Prix</label>
-                            <input type="number" step="0.01" id="editPrice" name="price" 
-                                   class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required>
+                            <input type="number" step="0.01" id="editPrice" name="price" required
+                                   class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
                         <div>
                             <label for="editStock" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Stock</label>
-                            <input type="number" id="editStock" name="stock" value="{{ $product->stock }}" readonly
+                            <input type="number" id="editStock" name="stock" readonly
                                    class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100 cursor-not-allowed">
                         </div>
-                        <button type="submit" 
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <div>
+                            <label for="editDescription" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                            <textarea id="editDescription" name="description" rows="3"
+                                      class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></textarea>
+                        </div>
+                        <div>
+                            <!-- Champ caché pour envoyer "0" si la case n'est pas cochée -->
+                            <input type="hidden" name="is_sterilized" value="0">
+                            <!-- Case à cocher -->
+                            <input type="checkbox" id="editIsSterilized" name="is_sterilized" value="1"
+                                   class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-600">
+                            <label for="editIsSterilized" class="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Stérilisé</label>
+                        </div>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Sauvegarder
                         </button>
                         <button type="button" onclick="closeEditModal()" 
@@ -163,14 +194,10 @@
                 </div>
             </div>
         </div>
-
-        {{-- Pagination --}}
-        {{ $products->links() }}
     </div>
 
     <script>
         function toggleAddForm() {
-            console.log('toggleAddForm exécuté');
             const addForm = document.getElementById('addForm');
             addForm.classList.toggle('hidden');
         }
@@ -181,6 +208,8 @@
             document.getElementById('editContainerId').value = product.container_id;
             document.getElementById('editPrice').value = product.price;
             document.getElementById('editStock').value = product.stock;
+            document.getElementById('editDescription').value = product.description || '';
+            document.getElementById('editIsSterilized').checked = product.is_sterilized;
             document.getElementById('editForm').action = `/products/${product.id}`;
             document.getElementById('editModal').classList.remove('hidden');
         }
