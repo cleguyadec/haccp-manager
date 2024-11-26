@@ -1,5 +1,7 @@
 <?php
 
+use Intervention\Image\Image;
+use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LotController;
 use App\Http\Controllers\FridgeController;
@@ -69,6 +71,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+
+Route::get('/test-canvas', function () {
+    $manager = new ImageManager(['driver' => 'gd']); // ou 'imagick'
+    $canvas = $manager->canvas(800, 600, '#ff0000');
+
+    return $canvas->response('jpg');
 });
 
 require __DIR__.'/auth.php';

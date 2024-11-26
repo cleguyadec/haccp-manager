@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Fridge;
 use Illuminate\Http\Request;
+use Intervention\Image\Facades\Image;
 use App\Models\TemperatureImage;
 use Illuminate\Support\Facades\Storage;
 use thiagoalessio\TesseractOCR\TesseractOCR;
@@ -82,28 +83,37 @@ class FridgeController extends Controller
     {
         // Validation de la requête
         $validated = $request->validate([
-            'image' => 'required|image|max:2048', // Fichier image requis
+            'image' => 'required|image|max:10240', // Accepte jusqu'à 10 Mo
         ]);
-
-        // Stockage de l'image
+    
+        // Chemin pour le stockage de l'image
         $path = $request->file('image')->store('temperatures', 'public');
-
+    
+        // Compression de l'image
+        $imagePath = storage_path('app/public/' . $path);
+        $image = Image::make($imagePath)->resize(800, null, function ($constraint) {
+            $constraint->aspectRatio(); // Maintient les proportions
+        })->encode('jpg', 75); // Compresse avec 75% de qualité
+    
+        // Sauvegarde l'image compressée
+        $image->save($imagePath);
+    
         // Création d'un nouvel enregistrement de température
         $temperature = new TemperatureImage();
         $temperature->fridge_id = $fridge->id;
         $temperature->image_path = $path;
         $temperature->captured_at = now();
-
+    
         // Si une extraction OCR est disponible, ajoutez la température
         if (function_exists('extractTemperatureFromImage')) {
             $temperature->temperature = extractTemperatureFromImage($path);
         }
-
+    
         $temperature->save();
-
+    
         return back()->with('success', 'Température ajoutée avec succès.');
     }
-
+    
     // Méthode pour supprimer un frigo
     public function destroy(Fridge $fridge)
     {
