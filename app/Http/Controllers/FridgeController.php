@@ -1,0 +1,117 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Fridge;
+use Illuminate\Http\Request;
+use App\Models\TemperatureImage;
+use Illuminate\Support\Facades\Storage;
+use thiagoalessio\TesseractOCR\TesseractOCR;
+
+class FridgeController extends Controller
+{
+    public function index()
+    {
+        $fridges = Fridge::with('temperatures')->get();
+        return view('fridges.index', compact('fridges'));
+    }
+
+    public function create()
+    {
+        return view('fridges.create');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'location' => 'nullable|string|max:255',
+        ]);
+
+        Fridge::create($validated);
+        return redirect()->route('fridges.index')->with('success', 'Frigo ajouté avec succès.');
+    }
+
+    public function show(Fridge $fridge)
+    {
+        return view('fridges.show', compact('fridge'));
+    }
+
+    public function manage()
+    {
+        $fridges = Fridge::all(); // Exemple : récupérer tous les frigos
+        return view('fridges.index', compact('fridges'));
+    }
+
+    public function uploadTemperature(Request $request, Fridge $fridge)
+    {
+        // Validation de la requête
+        $validated = $request->validate([
+            'image' => 'required|image|max:2048', // Fichier image requis
+        ]);
+
+        // Stockage de l'image
+        $path = $request->file('image')->store('temperatures', 'public');
+
+        // Création d'un nouvel enregistrement de température
+        $temperature = new TemperatureImage();
+        $temperature->fridge_id = $fridge->id;
+        $temperature->image_path = $path;
+        $temperature->captured_at = now();
+
+        // Si une extraction OCR est disponible, ajoutez la température
+        if (function_exists('extractTemperatureFromImage')) {
+            $temperature->temperature = extractTemperatureFromImage($path);
+        }
+
+        $temperature->save();
+
+        return back()->with('success', 'Température ajoutée avec succès.');
+    }
+
+    // Méthode pour supprimer un frigo
+    public function destroy(Fridge $fridge)
+    {
+        try {
+            $fridge->delete();
+            return redirect()->route('fridges.index')->with('success', 'Frigo supprimé avec succès.');
+        } catch (\Exception $e) {
+            return redirect()->route('fridges.index')->with('error', 'Une erreur est survenue lors de la suppression du frigo.');
+        }
+    }
+
+    // Fonction pour extraire la température via OCR
+    private function extractTemperatureFromImage($imagePath)
+    {
+        try {
+            // Utilisation de Tesseract pour lire le texte
+            $ocr = new TesseractOCR($imagePath);
+            $text = $ocr->run();
+
+            // Extraire les températures du texte avec une regex
+            if (preg_match('/-?\d+(\.\d+)?/', $text, $matches)) {
+                return $matches[0]; // Retourne la température trouvée
+            }
+
+            return null; // Si aucune température n'est détectée
+        } catch (\Exception $e) {
+            report($e); // Reporter les erreurs dans les logs
+            return null;
+        }
+    }
+
+    public function deleteTemperature($id)
+    {
+        $temperature = TemperatureImage::findOrFail($id);
+
+        // Supprime l'image du stockage
+        Storage::delete($temperature->image_path);
+
+        // Supprime l'entrée dans la base de données
+        $temperature->delete();
+
+        return redirect()->back()->with('success', 'Image supprimée avec succès.');
+    }
+
+}
+

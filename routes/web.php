@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LotController;
+use App\Http\Controllers\FridgeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LocationController;
@@ -16,6 +17,11 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+
+Route::resource('fridges', FridgeController::class)->middleware(['auth']);
+Route::post('/fridges/{fridge}/upload-temperature', [FridgeController::class, 'uploadTemperature'])->name('fridges.upload-temperature')->middleware(['auth']);
+Route::delete('/fridges/{fridge}', [FridgeController::class, 'destroy'])->name('fridges.destroy')->middleware(['auth']);
+Route::delete('/fridges/temperature/{id}', [FridgeController::class, 'deleteTemperature'])->name('fridges.upload-temperature.delete')->middleware(['auth']);
 
 Route::get('/products/manage', [ProductController::class, 'manage'])->name('products.manage')->middleware(['auth']);
 Route::resource('products', ProductController::class)->middleware('auth');
