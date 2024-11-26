@@ -20,40 +20,55 @@
         <div class="grid grid-cols-3 gap-4">
             @foreach ($photos as $photo)
                 <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-md">
-                    <img src="{{ asset('storage/' . $photo->photo_path) }}" 
-                         alt="Image du Lot" 
-                         class="rounded-md mb-2 cursor-pointer"
-                         @click="openLightbox('{{ asset('storage/' . $photo->photo_path) }}')">
-                    <form action="{{ route('lots.images.destroy', $photo->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" 
-                                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                            Supprimer
-                        </button>
-                    </form>
+                    <a href="{{ asset('storage/' . $photo->photo_path) }}" target="_blank">
+                        <img src="{{ asset('storage/' . $photo->photo_path) }}" 
+                             alt="Image du Lot" 
+                             class="rounded-md mb-2 cursor-pointer">
+                    </a>
+                    <button onclick="confirmDelete('{{ route('lots.images.destroy', $photo->id) }}')"
+                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Supprimer
+                    </button>
                 </div>
             @endforeach
         </div>
-
-        {{-- Lightbox Modal --}}
-        <div x-data="{ open: false, imageUrl: '' }" x-show="open" 
-             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75" 
-             x-cloak>
-            <div class="relative">
-                <img :src="imageUrl" alt="Zoomed Image" class="max-w-full max-h-screen rounded-md">
-                <button @click="open = false" 
-                        class="absolute top-4 right-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                    Fermer
-                </button>
-            </div>
-        </div>
-
-        <script>
-            function openLightbox(imageUrl) {
-                Alpine.store('lightbox').open = true;
-                Alpine.store('lightbox').imageUrl = imageUrl;
-            }
-        </script>
     </div>
+
+    {{-- SweetAlert2 Script --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(deleteUrl) {
+            Swal.fire({
+                title: 'Êtes-vous sûr ?',
+                text: "Cette action supprimera définitivement cette image.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Oui, supprimer',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = deleteUrl;
+
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_token';
+                    csrfInput.value = '{{ csrf_token() }}';
+                    form.appendChild(csrfInput);
+
+                    const methodInput = document.createElement('input');
+                    methodInput.type = 'hidden';
+                    methodInput.name = '_method';
+                    methodInput.value = 'DELETE';
+                    form.appendChild(methodInput);
+
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+    </script>
 </x-app-layout>
