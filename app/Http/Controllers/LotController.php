@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Location;
 use App\Models\LotPhoto;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class LotController extends Controller
 {
@@ -55,21 +56,34 @@ class LotController extends Controller
     public function store(Request $request, Product $product)
     {
         $request->validate([
-            'expiration_date' => 'nullable|date',
             'stock' => 'required|integer|min:0',
+            'production_date' => 'nullable|date',
+            'sterilization_date' => 'nullable|date',
+            'expiration_date' => 'nullable|date',
             'photos.*' => 'image|mimes:jpg,png,jpeg|max:2048',
         ]);
     
+    // Conversion des dates en objets Carbon
+    $productionDate = $request->production_date ? Carbon::parse($request->production_date) : now();
+    $sterilizationDate = $product->sterilized ? ($request->sterilization_date ? Carbon::parse($request->sterilization_date) : $productionDate) : null;
+
+    // Calcul automatique de la date de péremption
+    $expirationDate = $product->sterilized
+        ? $sterilizationDate->clone()->addMonths(9)
+        : $productionDate->clone()->addDays(3);
+    
         // Crée le lot
         $lot = $product->lots()->create([
-            'expiration_date' => $request->expiration_date,
             'stock' => $request->stock,
+            'production_date' => $productionDate,
+            'sterilization_date' => $sterilizationDate,
+            'expiration_date' => $expirationDate,
         ]);
     
         // Associe l'emplacement "Maison" avec le stock initial
         $defaultLocation = Location::firstOrCreate(['name' => 'Maison']);
         $lot->locations()->attach($defaultLocation->id, ['stock' => $request->stock]);
-
+    
         // Met à jour le stock du produit
         $product->updateStockFromLots();
     
@@ -81,9 +95,10 @@ class LotController extends Controller
             }
         }
     
-        return redirect()->route('lots.manage', ['product_id' => $lot->product_id])
-        ->with('success', 'Lot mis à jour avec succès.');
+        return redirect()->route('lots.manage', ['product_id' => $product->id])
+            ->with('success', 'Lot créé avec succès.');
     }
+    
 
     public function destroy(Lot $lot)
     {
@@ -98,54 +113,35 @@ class LotController extends Controller
 
     public function update(Request $request, Lot $lot)
     {
-        // Vérifier si la mise à jour concerne la date de péremption
-        if ($request->has('expiration_date')) {
-            $request->validate([
-                'expiration_date' => 'nullable|date',
-            ]);
-    
-            // Mettre à jour la date de péremption
-            $lot->update([
-                'expiration_date' => $request->input('expiration_date'),
-            ]);
-    
-            return redirect()->route('lots.manage', ['product_id' => $lot->product_id])
-            ->with('success', 'Lot mis à jour avec succès.');
-        }
-    
-        // Sinon, gérer le transfert de stock
         $request->validate([
-            'origin_location_id' => 'required|exists:locations,id',
-            'destination_location_id' => 'required|exists:locations,id|different:origin_location_id',
-            'stock_amount' => 'required|integer|min:1',
+            'stock' => 'required|integer|min:0',
+            'production_date' => 'nullable|date',
+            'sterilization_date' => 'nullable|date',
+            'expiration_date' => 'nullable|date',
         ]);
     
-        // Récupérer les emplacements concernés
-        $origin = $lot->locations->find($request->origin_location_id);
-        $destination = $lot->locations->find($request->destination_location_id);
-    
-        // Vérifier si l'emplacement d'origine a suffisamment de stock
-        if (!$origin || $origin->pivot->stock < $request->stock_amount) {
-            return redirect()->back()->with('error', 'Stock insuffisant pour déplacer cette quantité.');
-        }
-    
-        // Mise à jour des stocks
-        $lot->locations()->updateExistingPivot($request->origin_location_id, [
-            'stock' => $origin->pivot->stock - $request->stock_amount,
+        // Mettre à jour les informations du lot
+        $lot->update([
+            'stock' => $request->stock,
+            'production_date' => $request->production_date ?? $lot->production_date,
+            'sterilization_date' => $lot->product->is_sterilized ? $request->sterilization_date : null,
         ]);
     
-        if ($destination) {
-            $lot->locations()->updateExistingPivot($request->destination_location_id, [
-                'stock' => $destination->pivot->stock + $request->stock_amount,
-            ]);
-        } else {
-            $lot->locations()->attach($request->destination_location_id, [
-                'stock' => $request->stock_amount,
-            ]);
-        }
+    // Conversion des dates en objets Carbon
+    $productionDate = $request->production_date ? Carbon::parse($request->production_date) : $lot->production_date;
+    $sterilizationDate = $lot->product->sterilized ? ($request->sterilization_date ? Carbon::parse($request->sterilization_date) : $productionDate) : null;
+
+    // Calcul automatique de la date de péremption
+    $expirationDate = $lot->product->sterilized
+        ? $sterilizationDate->clone()->addMonths(9)
+        : $productionDate->clone()->addDays(3);
     
-        return redirect()->route('lots.locations.manage', $lot->id)->with('success', 'Stock déplacé avec succès.');
+        $lot->save();
+    
+        return redirect()->route('lots.manage', ['product_id' => $lot->product_id])
+            ->with('success', 'Lot mis à jour avec succès.');
     }
+    
     
 
     
@@ -308,9 +304,6 @@ class LotController extends Controller
         return redirect()->route('lots.locations.manage', $lot->id)
                          ->with('success', 'Stock transféré avec succès.');
     }
-    
-
-
 
 
 }
