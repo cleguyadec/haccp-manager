@@ -9,7 +9,8 @@ class Lot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'expiration_date', 'stock'];
+    protected $fillable = ['product_id', 'expiration_date', 'stock','production_date',
+    'sterilization_date'];
 
     // Relation avec les emplacements
     public function locations()
@@ -42,6 +43,17 @@ class Lot extends Model
     
         // Mettre à jour le stock du produit associé
         $this->product->updateStockFromLots();
+    }
+    
+    public function calculateExpirationDate()
+    {
+        if ($this->product->is_sterilized) {
+            // Produit stérilisé : date de stérilisation + 9 mois
+            $this->expiration_date = $this->sterilization_date ? $this->sterilization_date->addMonths(9) : null;
+        } else {
+            // Produit non stérilisé : date de production + 3 jours
+            $this->expiration_date = $this->production_date ? $this->production_date->addDays(3) : null;
+        }
     }
 }
 
