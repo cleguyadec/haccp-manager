@@ -14,6 +14,28 @@
             </button>
         </form>
 
+        {{-- Formulaire de filtrage --}}
+        <form method="GET" action="{{ route('fridges.show', $fridge->id) }}" class="flex items-center space-x-4 mb-6">
+            <div>
+                <label for="start_date" class="block text-sm font-medium">Date de début</label>
+                <input type="date" name="start_date" id="start_date" 
+                       value="{{ request('start_date') }}" 
+                       class="border-gray-900 dark:border-gray-600 text-black  rounded-md shadow-sm w-full">
+            </div>
+            <div>
+                <label for="end_date" class="block text-sm font-medium">Date de fin</label>
+                <input type="date" name="end_date" id="end_date" 
+                       value="{{ request('end_date') }}" 
+                       class="border-gray-300 dark:border-gray-600 text-black rounded-md shadow-sm w-full">
+            </div>
+            <div class="pt-4">
+                <button type="submit" 
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Filtrer
+                </button>
+            </div>
+        </form>
+
         {{-- Table des relevés de température --}}
         <h2 class="text-xl font-bold mt-6">Relevés de Température</h2>
         <table class="w-full mt-4 border-collapse border border-gray-300 dark:border-gray-700">
@@ -25,11 +47,10 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($fridge->temperatures as $temperature)
+                @foreach ($temperatures as $temperature)
                     <tr class="bg-gray-50 dark:bg-gray-800">
                         <td class="border border-gray-300 dark:border-gray-700 px-4 py-2">{{ $temperature->captured_at }}</td>
                         <td class="border border-gray-300 dark:border-gray-700 px-4 py-2">
-                            {{-- Lien qui ouvre l'image dans un nouvel onglet --}}
                             <a href="{{ Storage::url($temperature->image_path) }}" target="_blank">
                                 <img src="{{ Storage::url($temperature->image_path) }}" 
                                      alt="Image" 

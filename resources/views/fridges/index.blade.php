@@ -56,19 +56,34 @@
                     <div>
                         <h2 class="text-xl font-bold">{{ $fridge->name }}</h2>
                         <p>Emplacement : {{ $fridge->location }}</p>
-                        <a href="{{ route('fridges.show', $fridge) }}" class="text-blue-500 hover:underline">Voir les images</a>
                     </div>
 
-                    {{-- Bouton pour supprimer un frigo avec SweetAlert2 --}}
-                    <button onclick="confirmDelete('{{ route('fridges.destroy', $fridge) }}')" 
-                            class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
-                        Supprimer
-                    </button>
+                    {{-- Actions sur le frigo --}}
+                    <div class="space-x-2">
+                        {{-- Bouton pour voir les images --}}
+                        <a href="{{ route('fridges.show', $fridge) }}" 
+                           class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+                            Voir les Images
+                        </a>
+
+                        {{-- Bouton pour éditer le frigo --}}
+                        <a href="{{ route('fridges.edit', $fridge) }}" 
+                           class="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded">
+                            Éditer
+                        </a>
+
+                        {{-- Bouton pour supprimer un frigo avec SweetAlert2 --}}
+                        <button onclick="confirmDelete('{{ route('fridges.destroy', $fridge) }}')" 
+                                class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
+                            Supprimer
+                        </button>
+                    </div>
                 </div>
             @endforeach
         </div>
     </div>
 
+    {{-- Script SweetAlert2 --}}
     <script>
         function confirmDelete(deleteUrl) {
             Swal.fire({
@@ -104,6 +119,4 @@
             });
         }
     </script>
-    
-
 </x-app-layout>

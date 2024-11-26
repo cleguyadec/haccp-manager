@@ -32,10 +32,45 @@ class FridgeController extends Controller
         return redirect()->route('fridges.index')->with('success', 'Frigo ajouté avec succès.');
     }
 
-    public function show(Fridge $fridge)
+    public function show(Fridge $fridge, Request $request)
     {
-        return view('fridges.show', compact('fridge'));
+        $query = $fridge->temperatures();
+    
+        // Appliquer les filtres de date si fournis
+        if ($request->filled('start_date')) {
+            $query->whereDate('captured_at', '>=', $request->start_date);
+        }
+    
+        if ($request->filled('end_date')) {
+            $query->whereDate('captured_at', '<=', $request->end_date);
+        }
+    
+        $temperatures = $query->orderBy('captured_at', 'desc')->get();
+    
+        return view('fridges.show', [
+            'fridge' => $fridge,
+            'temperatures' => $temperatures,
+        ]);
     }
+
+    public function edit(Fridge $fridge)
+{
+    return view('fridges.edit', compact('fridge'));
+}
+
+    public function update(Request $request, Fridge $fridge)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'location' => 'nullable|string|max:255',
+        ]);
+
+        $fridge->update($request->only(['name', 'location']));
+
+        return redirect()->route('fridges.index')->with('success', 'Frigo mis à jour avec succès.');
+    }
+
+    
 
     public function manage()
     {
