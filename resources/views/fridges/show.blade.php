@@ -51,8 +51,8 @@
                     <tr class="bg-gray-50 dark:bg-gray-800">
                         <td class="border border-gray-300 dark:border-gray-700 px-4 py-2">{{ $temperature->captured_at }}</td>
                         <td class="border border-gray-300 dark:border-gray-700 px-4 py-2">
-                            <a href="{{ Storage::url($temperature->image_path) }}" target="_blank">
-                                <img src="{{ Storage::url($temperature->image_path) }}" 
+                            <a href="{{ asset('storage/' . $temperature->image_path) }}" target="_blank">
+                                <img src="{{ asset('storage/' . $temperature->image_path) }}" 
                                      alt="Image" 
                                      class="w-20 h-20 object-cover cursor-pointer">
                             </a>

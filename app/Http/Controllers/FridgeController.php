@@ -86,27 +86,29 @@ class FridgeController extends Controller
             'image' => 'required|image|max:10240', // Accepte jusqu'à 10 Mo
         ]);
     
-        // Chemin pour le stockage de l'image
-        $path = $request->file('image')->store('temperatures', 'public');
-    
-        // Compression de l'image
-        $imagePath = storage_path('app/public/' . $path);
-        $image = Image::make($imagePath)->resize(800, null, function ($constraint) {
+        // Réduire et compresser l'image
+        $image = Image::make($request->file('image'));
+        $image->resize(800, null, function ($constraint) {
             $constraint->aspectRatio(); // Maintient les proportions
         })->encode('jpg', 75); // Compresse avec 75% de qualité
     
-        // Sauvegarde l'image compressée
-        $image->save($imagePath);
+        // Générer un chemin unique pour l'image
+        $filename = uniqid() . '.jpg';
+        $path = 'storage/temperatures/' . $filename;
+    
+        // Sauvegarder l'image dans le dossier public/storage/temperatures
+        $fullPath = public_path($path);
+        $image->save($fullPath);
     
         // Création d'un nouvel enregistrement de température
         $temperature = new TemperatureImage();
         $temperature->fridge_id = $fridge->id;
-        $temperature->image_path = $path;
+        $temperature->image_path = 'temperatures/' . $filename; // Chemin relatif
         $temperature->captured_at = now();
     
         // Si une extraction OCR est disponible, ajoutez la température
         if (function_exists('extractTemperatureFromImage')) {
-            $temperature->temperature = extractTemperatureFromImage($path);
+            $temperature->temperature = extractTemperatureFromImage($fullPath);
         }
     
         $temperature->save();
@@ -148,13 +150,13 @@ class FridgeController extends Controller
     public function deleteTemperature($id)
     {
         $temperature = TemperatureImage::findOrFail($id);
-
-        // Supprime l'image du stockage
-        Storage::delete($temperature->image_path);
-
+    
+        // Supprime l'image du stockage en précisant le disque public
+        Storage::disk('public')->delete($temperature->image_path);
+    
         // Supprime l'entrée dans la base de données
         $temperature->delete();
-
+    
         return redirect()->back()->with('success', 'Image supprimée avec succès.');
     }
 
