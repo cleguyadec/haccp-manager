@@ -52,8 +52,14 @@ class LotImageController extends Controller
 
     public function destroy(LotPhoto $image)
     {
+        // Supprime l'image du stockage
+        if (Storage::disk('public')->exists($image->photo_path)) {
+            Storage::disk('public')->delete($image->photo_path);
+        }
+    
+        // Supprime l'entrée dans la base de données
         $image->delete();
-
+    
         return redirect()->back()->with('success', 'Image supprimée avec succès.');
     }
 }

@@ -55,39 +55,32 @@ class LotController extends Controller
 
     public function store(Request $request, Product $product)
     {
-        $request->validate([
-            'stock' => 'required|integer|min:0',
-            'production_date' => 'nullable|date',
+        $validated = $request->validate([
+            'production_date' => 'required|date',
             'sterilization_date' => 'nullable|date',
             'expiration_date' => 'nullable|date',
+            'stock' => 'required|integer|min:0',
             'photos.*' => 'image|mimes:jpg,png,jpeg|max:2048',
         ]);
     
-    // Conversion des dates en objets Carbon
-    $productionDate = $request->production_date ? Carbon::parse($request->production_date) : now();
-    $sterilizationDate = $product->sterilized ? ($request->sterilization_date ? Carbon::parse($request->sterilization_date) : $productionDate) : null;
-
-    // Calcul automatique de la date de péremption
-    $expirationDate = $product->sterilized
-        ? $sterilizationDate->clone()->addMonths(9)
-        : $productionDate->clone()->addDays(3);
+        // Convertir les dates au format 'YYYY-MM-DD'
+        $productionDate = Carbon::parse($validated['production_date'])->toDateString();
+        $sterilizationDate = isset($validated['sterilization_date']) 
+            ? Carbon::parse($validated['sterilization_date'])->toDateString() 
+            : null;
+        $expirationDate = isset($validated['expiration_date']) 
+            ? Carbon::parse($validated['expiration_date'])->toDateString() 
+            : null;
     
-        // Crée le lot
+        // Création du lot
         $lot = $product->lots()->create([
-            'stock' => $request->stock,
             'production_date' => $productionDate,
             'sterilization_date' => $sterilizationDate,
             'expiration_date' => $expirationDate,
+            'stock' => $validated['stock'],
         ]);
     
-        // Associe l'emplacement "Maison" avec le stock initial
-        $defaultLocation = Location::firstOrCreate(['name' => 'Maison']);
-        $lot->locations()->attach($defaultLocation->id, ['stock' => $request->stock]);
-    
-        // Met à jour le stock du produit
-        $product->updateStockFromLots();
-    
-        // Ajoute les photos si présentes
+        // Ajouter des photos si présentes
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $photo) {
                 $path = $photo->store('lot_photos', 'public');
@@ -98,6 +91,8 @@ class LotController extends Controller
         return redirect()->route('lots.manage', ['product_id' => $product->id])
             ->with('success', 'Lot créé avec succès.');
     }
+    
+    
     
 
     public function destroy(Lot $lot)
@@ -113,34 +108,35 @@ class LotController extends Controller
 
     public function update(Request $request, Lot $lot)
     {
-        $request->validate([
-            'stock' => 'required|integer|min:0',
-            'production_date' => 'nullable|date',
+        $validated = $request->validate([
+            'production_date' => 'required|date',
             'sterilization_date' => 'nullable|date',
             'expiration_date' => 'nullable|date',
+            'stock' => 'required|integer|min:0',
         ]);
     
-        // Mettre à jour les informations du lot
+        // Convertir les dates au format 'YYYY-MM-DD'
+        $productionDate = Carbon::parse($validated['production_date'])->toDateString();
+        $sterilizationDate = isset($validated['sterilization_date'])
+            ? Carbon::parse($validated['sterilization_date'])->toDateString()
+            : null;
+        $expirationDate = isset($validated['expiration_date'])
+            ? Carbon::parse($validated['expiration_date'])->toDateString()
+            : null;
+    
+        // Mise à jour des champs
         $lot->update([
-            'stock' => $request->stock,
-            'production_date' => $request->production_date ?? $lot->production_date,
-            'sterilization_date' => $lot->product->is_sterilized ? $request->sterilization_date : null,
+            'production_date' => $productionDate,
+            'sterilization_date' => $sterilizationDate,
+            'expiration_date' => $expirationDate,
+            'stock' => $validated['stock'],
         ]);
-    
-    // Conversion des dates en objets Carbon
-    $productionDate = $request->production_date ? Carbon::parse($request->production_date) : $lot->production_date;
-    $sterilizationDate = $lot->product->sterilized ? ($request->sterilization_date ? Carbon::parse($request->sterilization_date) : $productionDate) : null;
-
-    // Calcul automatique de la date de péremption
-    $expirationDate = $lot->product->sterilized
-        ? $sterilizationDate->clone()->addMonths(9)
-        : $productionDate->clone()->addDays(3);
-    
-        $lot->save();
     
         return redirect()->route('lots.manage', ['product_id' => $lot->product_id])
             ->with('success', 'Lot mis à jour avec succès.');
     }
+    
+    
     
     
 

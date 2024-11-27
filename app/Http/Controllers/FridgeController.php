@@ -150,13 +150,13 @@ class FridgeController extends Controller
     public function deleteTemperature($id)
     {
         $temperature = TemperatureImage::findOrFail($id);
-
-        // Supprime l'image du stockage
-        Storage::delete($temperature->image_path);
-
+    
+        // Supprime l'image du stockage en précisant le disque public
+        Storage::disk('public')->delete($temperature->image_path);
+    
         // Supprime l'entrée dans la base de données
         $temperature->delete();
-
+    
         return redirect()->back()->with('success', 'Image supprimée avec succès.');
     }
 
