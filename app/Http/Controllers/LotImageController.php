@@ -21,7 +21,7 @@ class LotImageController extends Controller
     {
         // Validation
         $validated = $request->validate([
-            'photos.*' => 'required|image|max:10240', // Maximum 2MB par image
+            'photos.*' => 'required|image|max:10240', // Maximum 10MB par image
         ]);
     
         foreach ($request->file('photos') as $photo) {
@@ -31,15 +31,19 @@ class LotImageController extends Controller
                 $constraint->aspectRatio(); // Conserver les proportions
             })->encode('jpg', 75); // Compresser à 75% de qualité
     
-            // Générer un chemin pour l'image
-            $path = 'photos/' . uniqid() . '.jpg';
+            // Générer un nom unique pour l'image
+            $filename = uniqid() . '.jpg';
     
-            // Sauvegarder l'image dans le système de fichiers
-            Storage::disk('public')->put($path, $image);
+            // Chemin où l'image sera sauvegardée
+            $path = 'storage/photos/' . $filename;
+    
+            // Sauvegarder l'image dans le dossier public/storage/photos
+            $fullPath = public_path($path);
+            $image->save($fullPath);
     
             // Enregistrer dans la base de données
             $lot->photos()->create([
-                'photo_path' => $path,
+                'photo_path' => 'photos/' . $filename, // Chemin relatif à `public/storage`
             ]);
         }
     
