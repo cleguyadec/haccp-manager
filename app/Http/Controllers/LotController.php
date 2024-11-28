@@ -79,6 +79,20 @@ class LotController extends Controller
             'expiration_date' => $expirationDate,
             'stock' => $validated['stock'],
         ]);
+
+               // Crée le lot
+               $lot = $product->lots()->create([
+                'expiration_date' => $request->expiration_date,
+                'stock' => $request->stock,
+            ]);
+        
+            // Associe l'emplacement "maison" avec le stock initial
+            $defaultLocation = Location::firstOrCreate(['name' => 'Maison']);
+            $lot->locations()->attach($defaultLocation->id, ['stock' => $request->stock]);
+    
+            // Met à jour le stock du produit
+            $product->updateStockFromLots();
+        
     
         // Ajouter des photos si présentes
         if ($request->hasFile('photos')) {
@@ -135,7 +149,6 @@ class LotController extends Controller
         return redirect()->route('lots.manage', ['product_id' => $lot->product_id])
             ->with('success', 'Lot mis à jour avec succès.');
     }
-    
     
     
     
