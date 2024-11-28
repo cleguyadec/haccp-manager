@@ -72,13 +72,20 @@ class LotController extends Controller
             ? Carbon::parse($validated['expiration_date'])->toDateString() 
             : null;
     
-        // Création du lot
+        // Création du lot (une seule fois)
         $lot = $product->lots()->create([
             'production_date' => $productionDate,
             'sterilization_date' => $sterilizationDate,
             'expiration_date' => $expirationDate,
             'stock' => $validated['stock'],
         ]);
+    
+        // Associe l'emplacement "Maison" avec le stock initial
+        $defaultLocation = Location::firstOrCreate(['name' => 'Maison']);
+        $lot->locations()->attach($defaultLocation->id, ['stock' => $validated['stock']]);
+    
+        // Met à jour le stock du produit
+        $product->updateStockFromLots();
     
         // Ajouter des photos si présentes
         if ($request->hasFile('photos')) {
@@ -91,6 +98,7 @@ class LotController extends Controller
         return redirect()->route('lots.manage', ['product_id' => $product->id])
             ->with('success', 'Lot créé avec succès.');
     }
+    
     
     
     
@@ -135,7 +143,6 @@ class LotController extends Controller
         return redirect()->route('lots.manage', ['product_id' => $lot->product_id])
             ->with('success', 'Lot mis à jour avec succès.');
     }
-    
     
     
     

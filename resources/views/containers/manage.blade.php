@@ -94,8 +94,11 @@
         }
 
         function openEditModal(container) {
+            const editForm = document.getElementById('editForm');
             document.getElementById('editSize').value = container.size;
-            document.getElementById('editForm').action = `/containers/${container.id}`;
+
+            // Utiliser l'URL correcte (avec le chemin complet)
+            editForm.action = `{{ url('/containers') }}/${container.id}`;
             document.getElementById('editModal').classList.remove('hidden');
         }
 
