@@ -124,18 +124,18 @@
                     <p class="text-sm text-gray-700 dark:text-gray-300">Stock : {{ $product->stock }}</p>
                     <p class="text-sm text-gray-700 dark:text-gray-300">Stérilisé : {{ $product->is_sterilized ? 'Oui' : 'Non' }}</p>
                     <div class="mt-4 flex flex-wrap gap-2">
-                        <button onclick="openEditModal({{ $product }})" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Modifier</button>
+                        <button onclick="openEditModal({{ $product }})" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Edit</button>
                         <form action="{{ route('lots.create', $product->id) }}" method="GET" class="inline-block">
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Créer un lot</button>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Créer lot</button>
                         </form>
                         <form action="{{ route('lots.manage') }}" method="GET" class="inline">
                             <input type="hidden" name="product_id" value="{{ $product->id }}">
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Gérer les Lots</button>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Gérer Lots</button>
                         </form>
                         <form action="{{ route('products.destroy', $product) }}" method="POST" class="inline-block">
                             @csrf
                             @method('DELETE')
-                            <button type="button" onclick="confirmDeletion(this)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Supprimer</button>
+                            <button type="button" onclick="confirmDeletion(this)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Supp.</button>
                         </form>
                     </div>
                 </div>
@@ -219,7 +219,7 @@
             document.getElementById('editStock').value = product.stock;
             document.getElementById('editDescription').value = product.description || '';
             document.getElementById('editIsSterilized').checked = product.is_sterilized;
-            document.getElementById('editForm').action = `/products/${product.id}`;
+            document.getElementById('editForm').action = `{{ url('products') }}/${product.id}`;
             document.getElementById('editModal').classList.remove('hidden');
         }
 
