@@ -21,10 +21,14 @@ class ContainerController extends Controller
         return redirect()->route('containers.manage')->with('success', 'Contenant ajouté avec succès.');
     }
 
-    public function update(Request $request, Container $container)
+    public function update(Request $request, $id)
     {
-        $request->validate(['size' => 'required|string|max:255']);
-        $container->update($request->all());
+        $container = Container::findOrFail($id);
+        $request->validate([
+            'size' => 'required|string|max:255',
+        ]);
+        $container->update(['size' => $request->input('size')]);
+    
         return redirect()->route('containers.manage')->with('success', 'Contenant mis à jour avec succès.');
     }
 

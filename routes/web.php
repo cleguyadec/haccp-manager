@@ -35,7 +35,9 @@ Route::post('/containers', [ContainerController::class, 'store'])->name('contain
 Route::put('/containers/{container}', [ContainerController::class, 'update'])->name('containers.update')->middleware(['auth']);
 Route::delete('/containers/{container}', [ContainerController::class, 'destroy'])->name('containers.destroy')->middleware(['auth']);
 Route::post('/containers/destroy-with-replacement', [ContainerController::class, 'destroyWithReplacement'])
-     ->name('containers.destroyWithReplacement');
+     ->name('containers.destroyWithReplacement')->middleware(['auth']);
+Route::post('/containers/{id}', [ContainerController::class, 'update'])->name('containers.update')->middleware(['auth']);
+
 
 
 //gestion des emplacements des lots
