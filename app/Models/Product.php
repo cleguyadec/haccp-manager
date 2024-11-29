@@ -18,6 +18,7 @@ class Product extends Model
         'stock',
         'description',
         'is_sterilized',
+        'raw_material_cost',
     ];
 
     protected $casts = [

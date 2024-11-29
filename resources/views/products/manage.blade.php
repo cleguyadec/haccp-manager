@@ -13,6 +13,16 @@
                 </button>
             </form>
         </div>
+
+        @if ($errors->any())
+            <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         
         {{-- Bouton pour afficher le formulaire d’ajout --}}
         <button onclick="toggleAddForm()" 
@@ -46,6 +56,11 @@
                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required>
                 </div>
                 <div>
+                    <label for="raw_material_cost" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Coût des matières premières</label>
+                    <input type="number" step="0.01" id="raw_material_cost" name="raw_material_cost"
+                           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                </div>
+                <div class="hidden">
                     <label for="stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Stock</label>
                     <input type="number" id="stock" name="stock" value="0"
                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -74,7 +89,9 @@
                         <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Nom</th>
                         <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Contenant</th>
                         <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Prix</th>
+                        <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Prix de revient</th>
                         <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Stock</th>
+                        <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">CA estimé</th>
                         <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Description</th>
                         <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Stérilisé</th>
                         <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Actions</th>
@@ -86,7 +103,12 @@
                             <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->name }}</td>
                             <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->container->size }}</td>
                             <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->price }} €</td>
+                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->raw_material_cost }} €</td>
                             <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->stock }}</td>
+                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">
+                                {{ $product->stock * $product->price }} € 
+                                <small class="text-gray-700 dark:text-gray-400">({{ $product->stock * ($product->price - $product->raw_material_cost )}} €)</small>
+                            </td>
                             <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->description }}</td>
                             <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">{{ $product->is_sterilized ? 'Oui' : 'Non' }}</td>
                             <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">
@@ -121,7 +143,11 @@
                     <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $product->name }}</h3>
                     <p class="text-sm text-gray-700 dark:text-gray-300">Contenant : {{ $product->container->size }}</p>
                     <p class="text-sm text-gray-700 dark:text-gray-300">Prix : {{ $product->price }} €</p>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">Prix de revient : {{ $product->raw_material_cost }} €</p>
                     <p class="text-sm text-gray-700 dark:text-gray-300">Stock : {{ $product->stock }}</p>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">CA estimé : {{ $product->stock * $product->price }} € 
+                        <small class="text-gray-500 dark:text-gray-400">({{ $product->stock * ($product->price - $product->raw_material_cost )}} €)</small>
+                    </p>
                     <p class="text-sm text-gray-700 dark:text-gray-300">Stérilisé : {{ $product->is_sterilized ? 'Oui' : 'Non' }}</p>
                     <div class="mt-4 flex flex-wrap gap-2">
                         <button onclick="openEditModal({{ $product }})" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Edit</button>
@@ -175,6 +201,11 @@
                                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 </div>
                                 <div>
+                                    <label for="editRaw_material_cost" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Coût des matières premières</label>
+                                    <input type="number" step="0.01" id="editRaw_material_cost" name="raw_material_cost" required
+                                    class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                                             </div>
+                                <div>
                                     <label for="editStock" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Stock</label>
                                     <input type="number" id="editStock" name="stock" readonly
                                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100 cursor-not-allowed">
@@ -212,14 +243,20 @@
         }
 
         function openEditModal(product) {
+            console.log('Opening Edit Modal');
+            console.log(product); // Vérifiez les données du produit
             document.getElementById('editProductId').value = product.id;
             document.getElementById('editName').value = product.name;
             document.getElementById('editContainerId').value = product.container_id;
             document.getElementById('editPrice').value = product.price;
+            document.getElementById('editRaw_material_cost').value = product.raw_material_cost;
+            console.log('Raw Material Cost set:', product.raw_material_cost);
             document.getElementById('editStock').value = product.stock;
             document.getElementById('editDescription').value = product.description || '';
             document.getElementById('editIsSterilized').checked = product.is_sterilized;
             document.getElementById('editForm').action = `{{ url('products') }}/${product.id}`;
+            console.log('Form action set to:', `{{ url('products') }}/${product.id}`);
+
             document.getElementById('editModal').classList.remove('hidden');
         }
 

@@ -34,11 +34,12 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'container_id' => 'required|exists:containers,id',
             'price' => 'required|numeric|min:0',
+            'raw_material_cost' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'description' => 'nullable|string|max:1000',
             'is_sterilized' => 'boolean',
         ]);
-    
+        //dd($request);
         Product::create($validated);
         return redirect()->route('products.manage')->with('success', 'Produit ajouté avec succès.');
     }
@@ -68,13 +69,14 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'container_id' => 'required|exists:containers,id',
             'price' => 'required|numeric|min:0',
+            'raw_material_cost' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'description' => 'nullable|string',
             'is_sterilized' => 'boolean',
         ]);
     
         // Mise à jour du produit
-        $product->update($request->only(['name', 'container_id', 'price', 'stock', 'description', 'is_sterilized']));
+        $product->update($request->only(['name', 'container_id', 'price', 'raw_material_cost', 'stock', 'description', 'is_sterilized']));
         //dd($request->all());
 
         return redirect()->route('products.manage')->with('success', 'Produit mis à jour avec succès.');
