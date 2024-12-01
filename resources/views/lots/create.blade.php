@@ -39,12 +39,12 @@
                        class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required>
             </div>
 
-            {{-- Photos --}}
+            {{-- Photos 
             <div>
                 <label for="photos" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Photos</label>
                 <input type="file" id="photos" name="photos[]" multiple
                        class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-            </div>
+            </div>--}}
 
             {{-- Bouton d'enregistrement --}}
             <button type="submit" 

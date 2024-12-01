@@ -93,8 +93,9 @@ class ProductController extends Controller
                   ->orWhere('description', 'LIKE', "%$search%");
             });
         }
-    
-        $products = $query->paginate(10); // Limité à 10 produits par page
+        
+        
+        $products = $query->orderBy('name', 'asc')->paginate(10);
     
         return view('products.public', compact('products'));
     }
@@ -123,7 +124,7 @@ class ProductController extends Controller
                           });
         }
     
-        $products = $productsQuery->paginate(10); // Pagination ajoutée
+        $products = $productsQuery->orderBy('name', 'asc')->paginate(10);
         $containers = Container::all();
         return view('products.manage', [
             'products' => $products,
