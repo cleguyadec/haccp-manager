@@ -75,8 +75,15 @@
                         @else
                             <span class="text-gray-500 dark:text-gray-400">Action non disponible</span>
                         @endif
+
                         
+                        {{-- Bouton pour accéder à l'inventaire --}}
+                        <a href="{{ route('locations.inventory', ['location' => $location->id]) }}" 
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-block">
+                            Inventaire
+                        </a>
                         </td>
+
                     </tr>
                 @endforeach
             </tbody>

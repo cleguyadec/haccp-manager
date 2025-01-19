@@ -41,4 +41,9 @@ class Product extends Model
         $totalStock = $this->lots->sum('stock');
         $this->update(['stock' => $totalStock]);
     }
+
+    public function getFullNameAttribute()
+    {
+        return $this->name . ($this->container ? " ({$this->container['size']})" : '');
+    }
 }

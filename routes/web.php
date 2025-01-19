@@ -45,12 +45,14 @@ Route::get('/lots/{lot}/locations', [LotController::class, 'manageLocations'])->
 Route::post('/lots/{lot}/locations', [LotController::class, 'updateLocations'])->name('lots.locations.update');
 Route::post('/lots/{lot}/move-stock', [LotController::class, 'moveStock'])->name('lots.move-stock');
 
+
 // Route pour gérer les emplacements
 Route::get('/locations/manage', [LocationController::class, 'index'])->name('locations.manage');
 Route::post('/locations/manage', [LocationController::class, 'store'])->name('locations.store');
 Route::delete('/locations/{location}', [LocationController::class, 'destroy'])->name('locations.destroy');
 Route::put('/locations/{location}', [LocationController::class, 'update'])->name('locations.update');
 Route::post('/lots/{lot}/locations/transfer', [LotController::class, 'transferStock'])->name('lots.locations.transfer');
+Route::get('/locations/{location}/inventory', [LocationController::class, 'inventory'])->name('locations.inventory');
 
 
 // Gestion des lots

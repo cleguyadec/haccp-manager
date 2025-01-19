@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Lot;
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LocationController extends Controller
 {
@@ -74,5 +75,41 @@ class LocationController extends Controller
     
         return redirect()->route('locations.manage')->with('success', 'Emplacement supprimé avec succès. Les lots ont été déplacés vers "Maison".');
     }
+
+    public function inventory(Location $location)
+    {
+        $inventory = $location->lots()
+            ->join('products', 'lots.product_id', '=', 'products.id')
+            ->join('containers', 'products.container_id', '=', 'containers.id')
+            ->where('lot_location.stock', '>', 0) // Filtrer les stocks > 0
+            ->select(
+                'containers.size as container',
+                'products.name as product',
+                'lots.expiration_date as expiration_date',
+                'lot_location.stock as quantity',
+                'lots.id as lot_id'
+            )
+            ->orderBy('containers.size') // Trier par contenant
+            ->orderBy('products.name')  // Trier par produit
+            ->orderBy('lots.expiration_date') // Trier par date de péremption
+            ->get();
+
+        // Calcul des sous-totaux par contenant et produit
+        $subtotals = $inventory->groupBy('container')->map(function ($containerGroup) {
+            return [
+                'total' => $containerGroup->sum('quantity'),
+                'products' => $containerGroup->groupBy('product')->map(function ($productGroup) {
+                    return [
+                        'total' => $productGroup->sum('quantity'),
+                        'lots' => $productGroup,
+                    ];
+                }),
+            ];
+        });
+
+        return view('locations.inventory', compact('location', 'subtotals'));
+    }
+
+
 }
 

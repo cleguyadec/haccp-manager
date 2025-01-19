@@ -18,7 +18,7 @@ class LotController extends Controller
         $search = $request->input('search');
     
         // Construire la requête pour récupérer les lots
-        $lotsQuery = Lot::query();
+        $lotsQuery = Lot::query()->with('product.container');
     
         if ($productId) {
             // Filtrer les lots par produit

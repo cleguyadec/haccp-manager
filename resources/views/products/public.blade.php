@@ -74,7 +74,7 @@
     </div>
 
     <!-- Modale pour saisir le numéro de téléphone -->
-    <div id="modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
+    <div id="modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 items-center justify-center hidden">
         <div class="w-11/12 sm:w-2/3 lg:w-1/3 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Passer commande</h2>
             <form id="modalForm" onsubmit="submitOrder(event)">
