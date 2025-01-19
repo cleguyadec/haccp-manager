@@ -191,5 +191,32 @@
                 </tbody>
             </table>
         </div>
+        <div class="container mx-auto p-6">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Nombre de Lots et de Bocaux par Mois</h2>
+            <table class="table-auto w-full border-collapse border border-gray-300 dark:border-gray-600">
+                <thead>
+                    <tr class="bg-gray-200 dark:bg-gray-700">
+                        <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Mois</th>
+                        <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Nombre de Lots</th>
+                        <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Nombre de Bocaux</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($monthlyData as $data)
+                        <tr class="bg-white dark:bg-gray-800">
+                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">
+                                {{ $data->year_month }}
+                            </td>
+                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">
+                                {{ $data->lot_count }}
+                            </td>
+                            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-900 dark:text-gray-100">
+                                {{ $data->total_jars }}
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 </x-app-layout>

@@ -8,6 +8,8 @@ use App\Models\Location;
 use App\Models\LotPhoto;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 
 class LotController extends Controller
 {
@@ -168,7 +170,17 @@ class LotController extends Controller
             ->whereMonth('expiration_date', now()->month)
             ->get();
 
-        return view('dashboard', compact('expiredLots', 'currentMonthLots'));
+        // Données mensuelles pour le tableau
+        $monthlyData = Lot::select(
+            DB::raw('strftime("%Y-%m", production_date) as year_month'),
+            DB::raw('COUNT(*) as lot_count'),
+            DB::raw('SUM(stock) as total_jars')
+        )
+        ->groupBy('year_month')
+        ->orderBy('year_month', 'asc')
+        ->get();
+
+        return view('dashboard', compact('expiredLots', 'currentMonthLots', 'monthlyData'));
     }
 
     public function manageLocations(Lot $lot)
