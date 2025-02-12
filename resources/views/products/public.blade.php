@@ -33,24 +33,43 @@
                             <th class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Nom</th>
                             <th class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Contenant</th>
                             <th class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Prix</th>
-                            <th class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Description</th>
+                            <!-- T<th class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Description</th>
                             <th class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Stock</th>
-                            <th class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Stérilisé</th>
+                            <th class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Stérilisé</th>-->
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($products as $product)
                             <tr class="bg-white dark:bg-gray-800">
+                                <!-- Quantité -->
                                 <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-gray-900 dark:text-gray-100">
                                     <input type="number" name="quantities[{{ $product->id }}]" min="0" max="{{ $product->stock }}" 
                                            placeholder="0" class="w-16 sm:w-20 border-gray-300 rounded-md shadow-sm text-center dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                                 </td>
-                                <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->name }}</td>
-                                <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->container->size ?? 'N/A' }}</td>
-                                <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->price ?? 'N/A' }} €</td>
-                                <td class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->description ?? 'Pas de description' }}</td>
-                                <td class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->stock }}</td>
-                                <td class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->is_sterilized ? 'Oui' : 'Non' }}</td>
+                    
+                                <!-- Nom (cliquable) -->
+                                <td onclick="toggleDetails({{ $product->id }})" class="cursor-pointer border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100 font-bold underline">
+                                    {{ $product->name }}
+                                </td>
+                    
+                                <!-- Contenant -->
+                                <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">
+                                    {{ $product->container->size ?? 'N/A' }}
+                                </td>
+                    
+                                <!-- Prix -->
+                                <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">
+                                    {{ $product->price ?? 'N/A' }} €
+                                </td>
+                            </tr>
+                    
+                            <!-- Détails (caché en mobile) -->
+                            <tr id="details-{{ $product->id }}" class="hidden sm:table-row bg-gray-100 dark:bg-gray-900">
+                                <td colspan="4" class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">
+                                    <strong>Description :</strong> {{ $product->description ?? 'Pas de description' }}<br>
+                                    <strong>Stock :</strong> {{ $product->stock }}<br>
+                                    <strong>Stérilisé :</strong> {{ $product->is_sterilized ? 'Oui' : 'Non' }}
+                                </td>
                             </tr>
                         @empty
                             <tr>
@@ -136,5 +155,9 @@
 
             closeModal();
         }
+        function toggleDetails(productId) {
+        const detailsRow = document.getElementById(`details-${productId}`);
+        detailsRow.classList.toggle('hidden');
+    }
     </script>
 </x-guest-layout>
