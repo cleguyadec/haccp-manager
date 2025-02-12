@@ -32,9 +32,10 @@
                             <th class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Quantité</th>
                             <th class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Nom</th>
                             <th class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Contenant</th>
-                            <th class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Description</th>
-                            <th class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Stock</th>
-                            <th class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Stérilisé</th>
+                            <th class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Prix</th>
+                            <th class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Description</th>
+                            <th class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Stock</th>
+                            <th class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-left text-xs sm:text-sm text-gray-800 dark:text-gray-200">Stérilisé</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,13 +47,14 @@
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->name }}</td>
                                 <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->container->size ?? 'N/A' }}</td>
-                                <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->description ?? 'Pas de description' }}</td>
-                                <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->stock }}</td>
-                                <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->is_sterilized ? 'Oui' : 'Non' }}</td>
+                                <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->price ?? 'N/A' }} €</td>
+                                <td class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->description ?? 'Pas de description' }}</td>
+                                <td class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->stock }}</td>
+                                <td class="hidden sm:table-cell border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">{{ $product->is_sterilized ? 'Oui' : 'Non' }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Aucun produit disponible.</td>
+                                <td colspan="7" class="text-center border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">Aucun produit disponible.</td>
                             </tr>
                         @endforelse
                     </tbody>
