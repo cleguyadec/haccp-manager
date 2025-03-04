@@ -31,6 +31,18 @@
                                   : now()->addDays(3)->format('Y-m-d') }}" 
                        class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" readonly>
             </div>
+            {{-- Nombre de mois pour la péremption --}}
+            <div>
+                <label for="custom_expiration_months" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre de mois avant péremption</label>
+                <input type="number" id="custom_expiration_months" name="custom_expiration_months" min="1" max="36" value="9"
+                    class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+            </div>
+
+            {{-- Bouton pour recalculer la date de péremption --}}
+            <button type="button" id="recalculate_expiration"
+                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                Recalculer la Date de Péremption
+            </button>           
 
             {{-- Stock --}}
             <div>
@@ -58,7 +70,8 @@
         // Dynamiquement mettre à jour la date de péremption si les dates de production/stérilisation changent
         document.getElementById('production_date').addEventListener('change', updateExpirationDate);
         document.getElementById('sterilization_date')?.addEventListener('change', updateExpirationDate);
-
+        document.getElementById('recalculate_expiration').addEventListener('click', recalculateExpiration);
+        
         function updateExpirationDate() {
             const isSterilized = {{ $product->is_sterilized ? 'true' : 'false' }};
             const productionDate = document.getElementById('production_date').value;
@@ -74,6 +87,31 @@
             }
 
             document.getElementById('expiration_date').value = expirationDate.toISOString().split('T')[0];
+        }
+
+        function recalculateExpiration() {
+            const customMonthsInput = document.getElementById('custom_expiration_months');
+            const expirationDateInput = document.getElementById('expiration_date');
+            const productionDate = document.getElementById('production_date').value;
+            const sterilizationDate = document.getElementById('sterilization_date')?.value;
+            let customMonths = parseInt(customMonthsInput.value, 10);
+
+            if (!customMonths || customMonths < 1 || customMonths > 36) {
+                alert("Veuillez entrer un nombre de mois valide (entre 1 et 36).");
+                return;
+            }
+
+            let expirationDate = new Date(productionDate);
+            
+            if (sterilizationDate) {
+                expirationDate = new Date(sterilizationDate);
+            }
+
+            expirationDate.setMonth(expirationDate.getMonth() + customMonths);
+
+            expirationDateInput.value = expirationDate.toISOString().split('T')[0];
+
+            console.log("Nouvelle date de péremption :", expirationDate.toISOString().split('T')[0]); // Debug
         }
     </script>
 </x-app-layout>
