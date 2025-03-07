@@ -188,5 +188,21 @@
             // Ouverture du client mail
             window.location.href = mailto;
         }
+
+        function openModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.add('hidden');
+        }
+
+        function toggleDetails(productId) 
+        {
+        const detailsRow = document.getElementById(`details-${productId}`);
+        detailsRow.classList.toggle('hidden');
+        }
     </script>
 </x-guest-layout>
