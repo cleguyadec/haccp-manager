@@ -9,6 +9,16 @@
                 Pour passer commande, vous pouvez me contacter au 
                 <span class="font-bold">06 68 12 99 29</span> ou par mail à l'aide du formulaire ci-dessous (je vous rappellerai pour valider la commande).
             </p>
+        </br>
+            <h3>Retrait de commandes :</h3>
+            <!-- ✅ Liste en dehors des <p> -->
+                <ul class="list-disc list-inside ml-6 mt-2 text-sm sm:text-base">
+                    <li>Retrait sur place <strong>(date à valider ensemble)</strong> : 21 rue Duchassein à Puy-Guillaume</li>
+                    <li>Vente sur place <strong>(mercredi matin uniquement de 11h à 12h)</strong> : 21 rue Duchassein à Puy-Guillaume</li>
+                    <li>Marché de Riom le samedi matin des semaines impaires</li>
+                    <li>AMAP de Limon le mardi soir des semaines impaires</li>
+                    <li>Livraison (+4€) : Cébazat, marché de Vichy, à domicile après validation</li>
+                </ul>
         </div>
 
         <!-- Formulaire de recherche -->
@@ -113,12 +123,12 @@
                         <select id="pickup_location" name="pickup_location" required
                                 class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <option value="">-- Sélectionner --</option>
-                            <option>Rue Duchassein à Puy-Guillaume</option>
-                            <option>Marché de Puy-Guillaume</option>
+                            <option>Retrait sur place</option>
+                            <option>Vente sur place</option>
                             <option>Marché de Riom</option>
                             <option>AMAP de Limons</option>
-                            <option>Fournil "A deux pains d'ici" (Mons)</option>
-                        </select>
+                            <option>Livraison</option>
+                        </select>   
                     </div>
                     
                     <div class="mb-4">
@@ -211,6 +221,11 @@
 
             const consigneDiscount = returnedJars * 2;
             const totalFinal = (total - consigneDiscount).toFixed(2);
+            let livraisonSup = 0;
+            if (pickupLocation === 'Livraison') {
+                livraisonSup = 4;
+            }
+            const totalAvecLivraison = (parseFloat(totalFinal) + livraisonSup).toFixed(2);
            
             const message = `Bonjour ${name},\n\nVoici votre commande n° ${currentOrderId}:\n\n` +
                 `📅 Date de retrait souhaitée : ${pickupDate || '[À compléter]'}\n` +
@@ -220,7 +235,8 @@
                 `🧺 Produits commandés (2 € de consigne par bocal):\n- ${quantities.join('\n- ')}\n\n` +
                 `💰 Total : ${total.toFixed(2)} €\n` +
                 `♻️ Réduction consignes : -${consigneDiscount.toFixed(2)} €\n` +
-                `✅ Total final à régler : ${totalFinal} €\n\n` +
+                `🚚 Supplément livraison : +${livraisonSup.toFixed(2)} €\n` +
+                `✅ Total final à régler : ${totalAvecLivraison} €\n\n` +
                 `📞 Téléphone : ${phone || '[À compléter]'}`;
 
             document.getElementById('orderSummary').value = message;
@@ -259,6 +275,11 @@
 
             const consigneDiscount = returnedJars * 2;
             const totalFinal = (total - consigneDiscount).toFixed(2);
+            let livraisonSup = 0;
+            if (pickupLocation === 'Livraison') {
+                livraisonSup = 4;
+            }
+            const totalAvecLivraison = (parseFloat(totalFinal) + livraisonSup).toFixed(2);
             if (!currentOrderId && pickupDate && pickupLocation) {
                 currentOrderId = generateOrderId(pickupLocation, pickupDate);
             }
@@ -271,7 +292,8 @@
                 `🧺 Produits commandés (2 € de consigne par bocal):\n- ${quantities.join('\n- ')}\n\n` +
                 `💰 Total : ${total.toFixed(2)} €\n` +
                 `♻️ Réduction consignes : -${consigneDiscount.toFixed(2)} €\n` +
-                `✅ Total final à régler : ${totalFinal} €\n\n` +
+                `🚚 Supplément livraison : +${livraisonSup.toFixed(2)} €\n` +
+                `✅ Total final à régler : ${totalAvecLivraison} €\n\n` +
                 `📞 Téléphone : ${phone || '[À compléter]'}`;
 
             document.getElementById('orderSummary').value = message;
@@ -310,6 +332,11 @@
             const tva = totalHT * 0.055;
             const consigne = returnedJars * 2;
             const totalTTC = totalHT - consigne;
+            let livraisonSup = 0;
+            if (pickupLocation === 'Livraison') {
+                livraisonSup = 4;
+            }
+            const totalTTCFinal = totalTTC + livraisonSup;
 
             // === Titre et infos client ===
             const now = new Date().toISOString().slice(0, 10);
@@ -344,6 +371,11 @@
             doc.text(`Réduction consigne : -${consigne.toFixed(2)} €`, 140, finalY + 12);
             doc.setFont("Helvetica", "bold");
             doc.text(`Total TTC : ${totalTTC.toFixed(2)} €`, 140, finalY + 20);
+            if (livraisonSup > 0) {
+                doc.text(`+ Livraison : ${livraisonSup.toFixed(2)} €`, 140, finalY + 26);
+            }
+            doc.setFont("Helvetica", "bold");
+            doc.text(`Total à régler : ${totalTTCFinal.toFixed(2)} €`, 140, finalY + 34);
 
             doc.setFont("Helvetica", "normal");
             doc.text(`Téléphone : ${phone}`, 10, finalY + 30);
