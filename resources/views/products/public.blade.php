@@ -199,8 +199,9 @@
                     const price = parseFloat(productRow.querySelectorAll('td')[3].innerText.replace('€', '').trim()) || 0;
                     const quantity = parseInt(input.value);
 
-                    total += price * quantity;
-                    return `${productName} (${container}) ${price} € × ${quantity} → ${price * quantity} €`;
+                    PriceConsigne = price+2;
+                    total += PriceConsigne * quantity;
+                    return `${productName} (${container}) ${PriceConsigne} € × ${quantity} → ${PriceConsigne * quantity} €`;
                 });
 
             if (quantities.length === 0) {
@@ -211,13 +212,12 @@
             const consigneDiscount = returnedJars * 2;
             const totalFinal = (total - consigneDiscount).toFixed(2);
            
-            const message = `Bonjour ${name},\n\nVoici votre commande :\n\n` +
-                `Commande n° ${currentOrderId}\n\n` +
+            const message = `Bonjour ${name},\n\nVoici votre commande n° ${currentOrderId}:\n\n` +
                 `📅 Date de retrait souhaitée : ${pickupDate || '[À compléter]'}\n` +
                 `📍 Lieu de retrait : ${pickupLocation || '[À compléter]'}\n` +
                 `💳 Mode de paiement : ${paymentMode || '[À compléter]'}\n` +
                 `♻️ Bocaux consignés rapportés : ${returnedJars}\n\n` +
-                `🧺 Produits commandés :\n- ${quantities.join('\n- ')}\n\n` +
+                `🧺 Produits commandés (2 € de consigne par bocal):\n- ${quantities.join('\n- ')}\n\n` +
                 `💰 Total : ${total.toFixed(2)} €\n` +
                 `♻️ Réduction consignes : -${consigneDiscount.toFixed(2)} €\n` +
                 `✅ Total final à régler : ${totalFinal} €\n\n` +
@@ -247,8 +247,9 @@
                     const price = parseFloat(productRow.querySelectorAll('td')[3].innerText.replace('€', '').trim()) || 0;
                     const quantity = parseInt(input.value);
 
-                    total += price * quantity;
-                    return `${productName} (${container}) ${price} € × ${quantity} → ${price * quantity} €`;
+                    PriceConsigne = price+2;
+                    total += PriceConsigne * quantity;
+                    return `${productName} (${container}) ${PriceConsigne} € × ${quantity} → ${PriceConsigne * quantity} €`;
                 });
 
             if (quantities.length === 0) {
@@ -262,13 +263,12 @@
                 currentOrderId = generateOrderId(pickupLocation, pickupDate);
             }
 
-            const message = `Bonjour ${name || '[Nom]'},\n\nVoici votre commande :\n\n` +
-                `Commande n° ${currentOrderId}\n\n` +
+            const message = `Bonjour ${name || '[Nom]'},\n\nVoici votre commande n° ${currentOrderId}:\n\n` +
                 `📅 Date de retrait souhaitée : ${pickupDate || '[À compléter]'}\n` +
                 `📍 Lieu de retrait : ${pickupLocation || '[À compléter]'}\n` +
                 `💳 Mode de paiement : ${paymentMode || '[À compléter]'}\n` +
                 `♻️ Bocaux consignés rapportés : ${returnedJars}\n\n` +
-                `🧺 Produits commandés :\n- ${quantities.join('\n- ')}\n\n` +
+                `🧺 Produits commandés (2 € de consigne par bocal):\n- ${quantities.join('\n- ')}\n\n` +
                 `💰 Total : ${total.toFixed(2)} €\n` +
                 `♻️ Réduction consignes : -${consigneDiscount.toFixed(2)} €\n` +
                 `✅ Total final à régler : ${totalFinal} €\n\n` +
@@ -301,10 +301,10 @@
                 const container = row.querySelectorAll('td')[2].innerText.trim();
                 const price = parseFloat(row.querySelectorAll('td')[3].innerText.replace('€', '').trim());
 
-                const lineTotal = price * quantity;
+                const lineTotal = (price+2) * quantity;
                 totalHT += lineTotal;
 
-                productRows.push([name, container, quantity, price.toFixed(2) + " €", lineTotal.toFixed(2) + " €"]);
+                productRows.push([name, container, quantity, (price+2).toFixed(2) + " €", lineTotal.toFixed(2) + " €"]);
             });
 
             const tva = totalHT * 0.055;
@@ -315,7 +315,7 @@
             const now = new Date().toISOString().slice(0, 10);
             doc.setFont("Helvetica");
             doc.setFontSize(12);
-            doc.text("Choux Devant", 10, 10);
+            doc.text("Chou Devant", 10, 10);
             doc.setFontSize(10);
             doc.text(`Résumé de commande n° ${currentOrderId}`, 10, 16);
             doc.text(`Date : ${now}`, 160, 10);
