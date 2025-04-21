@@ -43,7 +43,7 @@
                             <tr class="bg-white dark:bg-gray-800">
                                 <!-- Quantité -->
                                 <td class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-gray-900 dark:text-gray-100">
-                                    <input type="number" name="quantities[{{ $product->id }}]" min="0" max="{{ $product->stock }}" 
+                                    <input type="number" name="quantities[{{ $product->id }}]" min="0" max="{{ $product->stock_maison }}" 
                                            placeholder="0" class="w-16 sm:w-20 border-gray-300 rounded-md shadow-sm text-center dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                                 </td>
                     
@@ -67,7 +67,7 @@
                             <tr id="details-{{ $product->id }}" class="hidden sm:table-row bg-gray-100 dark:bg-gray-900">
                                 <td colspan="4" class="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">
                                     <strong>Description :</strong> {{ $product->description ?? 'Pas de description' }}<br>
-                                    <strong>Stock :</strong> {{ $product->stock }}<br>
+                                    <strong>Stock :</strong> {{ $product->stock_maison }}<br>
                                     <strong>Stérilisé :</strong> {{ $product->is_sterilized ? 'Oui' : 'Non' }}
                                 </td>
                             </tr>
@@ -88,10 +88,6 @@
             </div>
         </form>
 
-        <!-- Pagination -->
-        <div class="mt-4">
-            {{ $products->appends(['search' => request('search')])->links() }}
-        </div>
     </div>
 
     <!-- Modale pour saisir le numéro de téléphone et afficher la commande -->

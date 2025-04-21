@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Container;
+use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -84,18 +86,36 @@ class ProductController extends Controller
 
     public function publicIndex(Request $request)
     {
-        $query = Product::where('stock', '>', 0);
+        // Récupérer l'ID de l'emplacement "Maison"
+        $maison = Location::where('name', 'Maison')->firstOrFail();
     
+        // Sous-requête pour calculer le stock total en "Maison" par produit
+        $stocks = DB::table('lot_location')
+            ->join('lots', 'lots.id', '=', 'lot_location.lot_id')
+            ->select('lots.product_id', DB::raw('SUM(lot_location.stock) as stock_maison'))
+            ->where('lot_location.location_id', $maison->id)
+            ->where('lot_location.stock', '>', 0)
+            ->groupBy('lots.product_id');
+    
+        // Récupération des produits ayant du stock dans Maison
+        $query = Product::with('container')
+            ->joinSub($stocks, 'stocks_maison', function ($join) {
+                $join->on('products.id', '=', 'stocks_maison.product_id');
+            });
+    
+        // Appliquer le filtre de recherche
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%$search%")
-                  ->orWhere('description', 'LIKE', "%$search%");
+                $q->where('products.name', 'LIKE', "%$search%")
+                  ->orWhere('products.description', 'LIKE', "%$search%");
             });
         }
-        
-        
-        $products = $query->orderBy('name', 'asc')->paginate(10);
+    
+        // Récupérer les produits + stock Maison
+        $products = $query->orderBy('products.name')
+                          ->select('products.*', 'stocks_maison.stock_maison')
+                          ->get();
     
         return view('products.public', compact('products'));
     }
