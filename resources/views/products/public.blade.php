@@ -138,8 +138,8 @@
                             <option value="">-- Sélectionner --</option>
                             <option>Virement</option>
                             <option>Chèque</option>
-                            <option>Carte</option>
-                            <option>Espèce</option>
+                            <option>Carte bancaire (sauf livraison Cébazat/Vichy)</option>
+                            <option>Espèces</option>
                         </select>
                     </div>
                     
