@@ -14,9 +14,8 @@
             <!-- ✅ Liste en dehors des <p> -->
                 <ul class="list-disc list-inside ml-6 mt-2 text-sm sm:text-base">
                     <li>Retrait sur place <strong>(date à valider ensemble)</strong> : 21 rue Duchassein à Puy-Guillaume</li>
-                    <li>Vente sur place <strong>(mercredi matin uniquement de 11h à 12h)</strong> : 21 rue Duchassein à Puy-Guillaume</li>
+                    <li>Vente sur place <strong>(tous les mercredis de 11h30 à 12h et les mardis des semaines impaires de 17h30 à 18h30)</strong> : 21 rue Duchassein à Puy-Guillaume</li>
                     <li>Marché de Riom le samedi matin des semaines impaires</li>
-                    <li>AMAP de Limon le mardi soir des semaines impaires</li>
                     <li>Livraison (+4€) : Cébazat, marché de Vichy, à domicile après validation</li>
                 </ul>
         </div>
@@ -126,9 +125,15 @@
                             <option>Retrait sur place</option>
                             <option>Vente sur place</option>
                             <option>Marché de Riom</option>
-                            <option>AMAP de Limons</option>
                             <option>Livraison</option>
                         </select>   
+                    </div>
+
+                    <div id="delivery_address_group" class="mb-4 hidden">
+                        <label for="delivery_address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Adresse de livraison</label>
+                        <textarea id="delivery_address" name="delivery_address" rows="2"
+                            class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                            placeholder="Adresse complète (rue, code postal, ville)"></textarea>
                     </div>
                     
                     <div class="mb-4">
@@ -192,6 +197,7 @@
 
         function openModal() {
             const phone = document.getElementById('phone').value;
+            const deliveryAddress = document.getElementById('delivery_address')?.value || '[À compléter]';
             const name = document.getElementById('name').value;
             const pickupDate = document.getElementById('pickup_date').value;
             const pickupLocation = document.getElementById('pickup_location').value;
@@ -230,6 +236,7 @@
             const message = `Bonjour ${name},\n\nVoici votre commande n° ${currentOrderId}:\n\n` +
                 `📅 Date de retrait souhaitée : ${pickupDate || '[À compléter]'}\n` +
                 `📍 Lieu de retrait : ${pickupLocation || '[À compléter]'}\n` +
+                `📍 Adresse de livraison : ${pickupLocation === 'Livraison' ? deliveryAddress : 'N/A'}\n\n` +
                 `💳 Mode de paiement : ${paymentMode || '[À compléter]'}\n` +
                 `♻️ Bocaux consignés rapportés : ${returnedJars}\n\n` +
                 `🧺 Produits commandés (2 € de consigne par bocal):\n- ${quantities.join('\n- ')}\n\n` +
@@ -246,6 +253,7 @@
 
         function updateOrderSummary() {
             const phone = document.getElementById('phone').value;
+            const deliveryAddress = document.getElementById('delivery_address')?.value || '[À compléter]';
             const name = document.getElementById('name').value;
             const pickupDate = document.getElementById('pickup_date').value;
             const pickupLocation = document.getElementById('pickup_location').value;
@@ -287,6 +295,7 @@
             const message = `Bonjour ${name || '[Nom]'},\n\nVoici votre commande n° ${currentOrderId}:\n\n` +
                 `📅 Date de retrait souhaitée : ${pickupDate || '[À compléter]'}\n` +
                 `📍 Lieu de retrait : ${pickupLocation || '[À compléter]'}\n` +
+                `📍 Adresse de livraison : ${pickupLocation === 'Livraison' ? deliveryAddress : 'N/A'}\n` +
                 `💳 Mode de paiement : ${paymentMode || '[À compléter]'}\n` +
                 `♻️ Bocaux consignés rapportés : ${returnedJars}\n\n` +
                 `🧺 Produits commandés (2 € de consigne par bocal):\n- ${quantities.join('\n- ')}\n\n` +
@@ -356,7 +365,7 @@
 
             // === Tableau de commande ===
             doc.autoTable({
-                startY: 60,
+                startY: 65,
                 head: [['Produit', 'Contenant', 'Qté', 'PU', 'Total']],
                 body: productRows,
                 styles: { fontSize: 10 },
@@ -379,6 +388,12 @@
 
             doc.setFont("Helvetica", "normal");
             doc.text(`Téléphone : ${phone}`, 10, finalY + 30);
+            if (pickupLocation === 'Livraison') {
+                const deliveryAddress = document.getElementById('delivery_address').value || '[Adresse manquante]';
+                doc.text(`Adresse de livraison : ${deliveryAddress}`, 10, 60);
+                finalY += 6;
+            }
+
 
             // === Téléchargement ===
             doc.save(`commande-${currentOrderId}.pdf`);
@@ -396,6 +411,16 @@
             // Quantités
             document.querySelectorAll('input[name^="quantities"]').forEach(input => {
                 input.addEventListener('input', updateOrderSummary);
+            });
+
+            document.getElementById('pickup_location').addEventListener('change', function () {
+                const addressGroup = document.getElementById('delivery_address_group');
+                if (this.value === 'Livraison') {
+                    addressGroup.classList.remove('hidden');
+                } else {
+                    addressGroup.classList.add('hidden');
+                    document.getElementById('delivery_address').value = '';
+                }
             });
         });
 
